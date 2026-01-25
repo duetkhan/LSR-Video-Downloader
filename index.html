@@ -63,7 +63,26 @@
 
   <!-- Result Section -->
   <section id="result-section">
-    <!-- Download links will appear here -->
+    <!-- Download links / YouTube embed will appear here -->
+  </section>
+
+  <!-- In-App Browser Section -->
+  <section id="browser-section" class="hidden">
+    <div id="tabs-bar">
+      <button id="new-tab-btn">+ New Tab</button>
+      <div id="tabs-container"></div>
+    </div>
+
+    <div id="url-bar">
+      <input type="text" id="browser-url" placeholder="Enter URL">
+      <button id="go-btn">Go</button>
+      <button id="back-btn"><</button>
+      <button id="forward-btn">></button>
+      <button id="refresh-btn">⟳</button>
+      <button id="home-btn">Home</button>
+    </div>
+
+    <iframe id="browser-iframe" src="" frameborder="0"></iframe>
   </section>
 
   <!-- Bottom Banner Ad -->
