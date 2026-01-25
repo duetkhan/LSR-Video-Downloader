@@ -1,73 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LSR Video Downloader</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSR Video Downloader</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header>
+  <h1>LSR Video Downloader</h1>
+</header>
 
-  <!-- Top Banner -->
-  <div id="top-banner">
-    <script>
-      atOptions = {
-        'key' : '3f673e5d02626eb857acc774c36f56a6',
-        'format' : 'iframe',
-        'height' : 60,
-        'width' : 468,
-        'params' : {}
-      };
-    </script>
-    <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
-  </div>
-
-  <header>
-    <h1>LSR Video Downloader</h1>
-  </header>
-
+<main>
   <!-- Downloader Input -->
-  <section id="downloader-section">
-    <input type="text" id="video-url" placeholder="Paste Video Link here...">
+  <section id="downloader">
+    <input type="text" id="video-url" placeholder="Paste video link here"/>
+    <select id="quality-select">
+      <option value="360p">360p</option>
+      <option value="720p">720p</option>
+      <option value="1080p">1080p</option>
+      <option value="mp3">MP3</option>
+    </select>
     <button id="download-btn">Download</button>
-    <button id="browse-btn" class="secondary-btn">Browse Platforms</button>
-    <button id="history-btn" class="secondary-btn">Download History</button>
-    <div id="loader" class="hidden">Processing...</div>
+
+    <!-- Extra buttons -->
+    <button id="browse-btn">Browse</button>
+    <button id="download-history-btn">Download History</button>
   </section>
 
-  <!-- Platform Logos Grid -->
-  <section id="platforms-grid">
-    <div class="platform-card" data-site="facebook">
-      <img src="assets/logos/facebook.png" alt="Facebook"><span>Facebook</span>
-    </div>
-    <div class="platform-card" data-site="tiktok">
-      <img src="assets/logos/tiktok.png" alt="TikTok"><span>TikTok</span>
-    </div>
-    <div class="platform-card" data-site="youtube">
-      <img src="assets/logos/youtube.png" alt="YouTube"><span>YouTube</span>
-    </div>
-    <div class="platform-card" data-site="instagram">
-      <img src="assets/logos/instagram.png" alt="Instagram"><span>Instagram</span>
-    </div>
-    <div class="platform-card" data-site="twitter">
-      <img src="assets/logos/twitter.png" alt="Twitter/X"><span>Twitter/X</span>
-    </div>
-    <div class="platform-card" data-site="likee">
-      <img src="assets/logos/likee.png" alt="Likee"><span>Likee</span>
-    </div>
-    <div class="platform-card" data-site="pinterest">
-      <img src="assets/logos/pinterest.png" alt="Pinterest"><span>Pinterest</span>
-    </div>
-    <div class="platform-card" data-site="vimeo">
-      <img src="assets/logos/vimeo.png" alt="Vimeo"><span>Vimeo</span>
-    </div>
-  </section>
-
-  <!-- Result Section -->
-  <section id="result-section"><!-- Download links / YouTube embed --></section>
-
-  <!-- Bottom Banner -->
-  <div id="bottom-banner">
+  <!-- Ads -->
+  <section id="home-ads">
     <script>
       atOptions = {
         'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
@@ -78,8 +40,9 @@
       };
     </script>
     <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
-  </div>
+  </section>
+</main>
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
