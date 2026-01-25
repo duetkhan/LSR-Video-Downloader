@@ -1,73 +1,46 @@
+const urlInput = document.getElementById('video-url');
 const downloadBtn = document.getElementById('download-btn');
-const videoURL = document.getElementById('video-url');
-const resultSection = document.getElementById('result-section');
+const qualitySelect = document.getElementById('quality-select');
 const browseBtn = document.getElementById('browse-btn');
-const historyBtn = document.getElementById('history-btn');
+const historyBtn = document.getElementById('download-history-btn');
 
-// Browse Button
-browseBtn.addEventListener('click', () => {
+browseBtn.addEventListener('click', ()=>{
   window.location.href = 'browser.html';
 });
 
-// Download History Button
-historyBtn.addEventListener('click', () => {
-  let history = JSON.parse(localStorage.getItem('downloadHistory') || "[]");
-  if(history.length === 0) return alert("No downloads yet!");
-  let historyText = history.map(h => `${h.timestamp}: ${h.url} (${h.quality})`).join('\n');
-  alert(historyText);
-});
+// API-based download
+async function getDirectVideoLink(url, quality){
+  const apiURL = `https://example-free-downloader-api.com/get?url=${encodeURIComponent(url)}&quality=${quality}`;
+  const response = await fetch(apiURL);
+  const data = await response.json();
+  return data.direct_link;
+}
 
-// Helper to trigger download in browser (auto create folder not possible in pure JS, but downloads go to default Downloads folder)
-function downloadFile(url, filename) {
+downloadBtn.addEventListener('click', async ()=>{
+  const url = urlInput.value.trim();
+  if(!url) return alert("Please paste video link");
+
+  const quality = qualitySelect.value;
+  const directLink = await getDirectVideoLink(url, quality);
+
+  if(!directLink) return alert("Failed to fetch direct video link");
+
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
+  a.href = directLink;
+  a.download = `video-${Date.now()}.mp4`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-}
 
-downloadBtn.addEventListener('click', () => {
-  const url = videoURL.value.trim();
-  if(!url) return alert("Please enter a video link");
+  let history = JSON.parse(localStorage.getItem('downloadHistory')||"[]");
+  history.push({url,quality,timestamp:new Date().toLocaleString()});
+  localStorage.setItem('downloadHistory',JSON.stringify(history));
 
-  resultSection.innerHTML = "<p>Processing...</p>";
+  alert("Download started!");
+});
 
-  setTimeout(() => {
-    let platform = "other";
-    if(url.includes("youtube.com") || url.includes("youtu.be")) platform = "youtube";
-
-    resultSection.innerHTML = "";
-
-    if(platform === "youtube") {
-      resultSection.innerHTML = `
-        <p>YouTube videos are watch-only. Download not supported.</p>
-        <iframe width="100%" height="200" src="${url.replace("watch?v=", "embed/")}" frameborder="0" allowfullscreen></iframe>
-      `;
-    } else {
-      // Download buttons
-      const qualities = ["360p","720p","1080p","mp3"];
-      let html = qualities.map(q => `<button class="download-link" data-quality="${q}">${q}</button>`).join(" ");
-      resultSection.innerHTML = `
-        ${html}
-        <div id="result-native">
-          <script async="async" data-cfasync="false" src="https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js"></script>
-          <div id="container-ae3f15925d8f1944704e01860015491c"></div>
-        </div>
-      `;
-
-      document.querySelectorAll(".download-link").forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const quality = btn.dataset.quality;
-          const filename = `video-${Date.now()}.mp4`;
-          downloadFile(url, filename);
-
-          // Save to localStorage history
-          let history = JSON.parse(localStorage.getItem('downloadHistory') || "[]");
-          history.push({url, quality, timestamp: new Date().toLocaleString()});
-          localStorage.setItem('downloadHistory', JSON.stringify(history));
-        });
-      });
-    }
-  },1000);
+historyBtn.addEventListener('click', ()=>{
+  let history = JSON.parse(localStorage.getItem('downloadHistory')||"[]");
+  if(history.length===0) return alert("No downloads yet");
+  alert(history.map(h=>`${h.timestamp}: ${h.url} (${h.quality})`).join("\n"));
 });
