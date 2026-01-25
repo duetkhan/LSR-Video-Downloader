@@ -3,67 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LSR Browser</title>
+<title>LSR Video Browser</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header>
+  <h1>Browser Mode</h1>
+</header>
 
-<!-- Top Banner -->
-<div id="top-banner">
-<script>
-  atOptions = {
-    'key' : 'd3ba86d4abd7cc73ecbfe82be6839a80',
-    'format' : 'iframe',
-    'height' : 90,
-    'width' : 728,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>
-</div>
+<!-- Tabs -->
+<section id="tab-controls">
+  <button id="new-tab-btn">+ New Tab</button>
+  <div id="tab-list"></div>
+</section>
 
 <!-- Browser Controls -->
-<div id="browser-controls">
-  <input type="text" id="browser-url" placeholder="Enter URL or Search...">
+<section id="browser-controls">
+  <input type="text" id="browser-url" placeholder="Search or paste URL"/>
   <button id="go-btn">Go</button>
   <button id="back-btn"><</button>
   <button id="forward-btn">></button>
   <button id="refresh-btn">⟳</button>
   <button id="home-btn">Home</button>
-  <button id="download-history-btn">Download History</button>
-</div>
+</section>
 
-<!-- Tabs Section -->
-<div id="tabs-container"></div>
-
-<!-- Default iframe -->
-<iframe id="browser-iframe" src="https://www.google.com" frameborder="0"></iframe>
+<!-- iframe container -->
+<div id="iframe-container"></div>
 
 <!-- Download Panel -->
-<div id="download-panel" class="hidden">
-  <p id="video-title">Video: N/A</p>
+<section id="download-panel" class="hidden">
+  <h3 id="video-title"></h3>
   <select id="quality-select">
     <option value="360p">360p</option>
     <option value="720p">720p</option>
     <option value="1080p">1080p</option>
     <option value="mp3">MP3</option>
   </select>
-  <button id="download-this-btn">Download</button>
-</div>
+  <button id="download-this-btn">Download This Video</button>
+  <button id="download-history-btn">Download History</button>
+</section>
 
-<!-- Bottom Banner -->
-<div id="bottom-banner">
-<script>
-  atOptions = {
-    'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-    'format' : 'iframe',
-    'height' : 250,
-    'width' : 300,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>
-</div>
+<!-- Ads -->
+<section id="browser-ads">
+  <script>
+    atOptions = {
+      'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+      'format' : 'iframe',
+      'height' : 50,
+      'width' : 320,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+</section>
 
 <script src="browser.js"></script>
 </body>
