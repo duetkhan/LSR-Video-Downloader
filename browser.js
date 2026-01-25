@@ -10,78 +10,66 @@ const downloadPanel = document.getElementById('download-panel');
 const downloadBtn = document.getElementById('download-this-btn');
 const qualitySelect = document.getElementById('quality-select');
 const videoTitle = document.getElementById('video-title');
+const historyBtn = document.getElementById('download-history-btn');
 
 let historyStack = [];
 let historyIndex = -1;
 
-// Navigate iframe
-function navigate(url) {
+// Navigate iframe with Google search fallback
+function navigate(url){
+  if(!url.includes("http")) url = "https://www.google.com/search?q="+encodeURIComponent(url);
   iframe.src = url;
   urlInput.value = url;
-
-  // Update history
   historyStack = historyStack.slice(0, historyIndex+1);
   historyStack.push(url);
   historyIndex++;
 }
 
-goBtn.addEventListener('click', () => {
-  const url = urlInput.value.trim();
-  if (!url) return;
-  navigate(url);
+// Controls
+goBtn.addEventListener('click',()=>navigate(urlInput.value));
+backBtn.addEventListener('click',()=>{
+  if(historyIndex>0){historyIndex--;iframe.src=historyStack[historyIndex];urlInput.value=historyStack[historyIndex];}
 });
+forwardBtn.addEventListener('click',()=>{
+  if(historyIndex<historyStack.length-1){historyIndex++;iframe.src=historyStack[historyIndex];urlInput.value=historyStack[historyIndex];}
+});
+refreshBtn.addEventListener('click',()=>iframe.src=iframe.src);
+homeBtn.addEventListener('click',()=>navigate('https://www.google.com'));
 
-backBtn.addEventListener('click', () => {
-  if (historyIndex > 0) {
-    historyIndex--;
-    iframe.src = historyStack[historyIndex];
-    urlInput.value = historyStack[historyIndex];
+// Download logic inside browser
+iframe.addEventListener('load',()=>{
+  const src = iframe.src;
+
+  // Check if URL contains known video platforms (simplified)
+  const videoPlatforms = ["facebook.com","tiktok.com","instagram.com","vimeo.com","pinterest.com","likee.com"];
+  const isVideoPage = videoPlatforms.some(site => src.includes(site));
+
+  if(isVideoPage){
+    downloadPanel.classList.remove('hidden');
+    videoTitle.innerText = `Video: ${src.split('/').pop()}`;
+  } else {
+    downloadPanel.classList.add('hidden');
   }
 });
 
-forwardBtn.addEventListener('click', () => {
-  if (historyIndex < historyStack.length -1) {
-    historyIndex++;
-    iframe.src = historyStack[historyIndex];
-    urlInput.value = historyStack[historyIndex];
-  }
-});
-
-refreshBtn.addEventListener('click', () => {
-  iframe.src = iframe.src;
-});
-
-homeBtn.addEventListener('click', () => {
-  navigate('https://www.google.com');
-});
-
-// Simulated "Download This Video" detection
-iframe.addEventListener('load', () => {
-  downloadPanel.classList.remove('hidden');
-  videoTitle.innerText = `Video: ${iframe.src.split('/').pop()}`;
-});
-
-// Download logic
-downloadBtn.addEventListener('click', () => {
+// Download Button Logic
+downloadBtn.addEventListener('click',()=>{
   const quality = qualitySelect.value;
   const videoURL = iframe.src;
-
   alert(`Downloading ${videoURL} at ${quality}`);
 
-  let history = JSON.parse(localStorage.getItem('downloadHistory') || "[]");
-  history.push({ url: videoURL, quality, timestamp: new Date().toLocaleString() });
-  localStorage.setItem('downloadHistory', JSON.stringify(history));
+  let history = JSON.parse(localStorage.getItem('downloadHistory')||"[]");
+  history.push({url:videoURL,quality,timestamp:new Date().toLocaleString()});
+  localStorage.setItem('downloadHistory',JSON.stringify(history));
+
+  // Trigger browser download
+  const a=document.createElement('a');a.href=videoURL;a.download=`video-${Date.now()}.mp4`;document.body.appendChild(a);a.click();document.body.removeChild(a);
 });
 
-// Show download history
-document.getElementById('download-history-btn').addEventListener('click', () => {
-  let history = JSON.parse(localStorage.getItem('downloadHistory') || "[]");
-  if(history.length === 0) return alert("No downloads yet!");
-  let historyText = history.map(h => `${h.timestamp}: ${h.url} (${h.quality})`).join('\n');
+// Download History Button
+historyBtn.addEventListener('click',()=>{
+  let history = JSON.parse(localStorage.getItem('downloadHistory')||"[]");
+  if(history.length===0) return alert("No downloads yet!");
+  let historyText = history.map(h=>`${h.timestamp}: ${h.url} (${h.quality})`).join('\n');
   alert(historyText);
 });
-
-// Optional SmartLink integration
-// You can redirect once on new tab or exit intent using provided SmartLink
-// Example:
-// window.location.href = "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f";
