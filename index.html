@@ -1,48 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LSR Video Downloader</title>
+<title>LSR Mini Browser</title>
 <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-<header>
-  <h1>LSR Video Downloader</h1>
-</header>
+<body class="opera-home">
 
-<main>
-  <!-- Downloader Input -->
-  <section id="downloader">
-    <input type="text" id="video-url" placeholder="Paste video link here"/>
-    <select id="quality-select">
-      <option value="360p">360p</option>
-      <option value="720p">720p</option>
-      <option value="1080p">1080p</option>
-      <option value="mp3">MP3</option>
-    </select>
-    <button id="download-btn">Download</button>
+<div class="top-bar">
+  <h2>LSR Mini</h2>
+</div>
 
-    <!-- Extra buttons -->
-    <button id="browse-btn">Browse</button>
-    <button id="download-history-btn">Download History</button>
-  </section>
+<div class="search-box">
+  <input type="text" placeholder="Search or type web address">
+  <button onclick="openBrowser()">Go</button>
+</div>
 
-  <!-- Ads -->
-  <section id="home-ads">
-    <script>
-      atOptions = {
-        'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-        'format' : 'iframe',
-        'height' : 50,
-        'width' : 320,
-        'params' : {}
-      };
-    </script>
-    <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
-  </section>
-</main>
+<div class="quick-actions">
+  <div onclick="location.href='browser.html'">🌐 Browse</div>
+  <div>⬇ Download</div>
+  <div>📂 History</div>
+</div>
 
-<script src="script.js"></script>
+<script>
+function openBrowser(){
+  location.href="browser.html";
+}
+</script>
+
 </body>
 </html>
