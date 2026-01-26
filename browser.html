@@ -1,36 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>LSR Browser</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browser</title>
 <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
-<header>
-  LSR Video Browser
-</header>
-
-<div id="browser-controls">
-  <input type="text" id="browser-url" placeholder="Search or paste URL">
-  <button id="go-btn">Go</button>
-  <button id="home-btn">Home</button>
+<div class="browser-bar">
+  <input id="address" placeholder="Search or type URL">
+  <button id="go">Go</button>
 </div>
 
-<div id="iframe-container">
-  <iframe id="browser-frame" src="https://www.google.com"></iframe>
-</div>
-
-<div id="download-panel" class="hidden">
-  <h3 id="video-title">Detected Video</h3>
-  <select id="quality-select">
-    <option value="360p">360p</option>
-    <option value="720p">720p</option>
-    <option value="1080p">1080p</option>
-  </select>
-  <button id="download-this-btn">Download This Video</button>
-</div>
+<iframe id="view" src="https://www.google.com"></iframe>
 
 <script src="browser.js"></script>
 </body>
