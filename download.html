@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LSR Video Downloader - Download</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+
+<!-- Monetag In-Page Push + Vignette -->
+<script>
+(function(s){
+  s.dataset.zone='10519506';
+  s.src='https://nap5k.com/tag.min.js';
+})([document.documentElement, document.body].filter(Boolean).pop()
+.appendChild(document.createElement('script')))
+</script>
+</head>
+<body>
+
+<!-- ================= TOP BANNER (468x60) ================= -->
+<div class="ad-box center">
+<script>
+atOptions = {
+  'key' : '3f673e5d02626eb857acc774c36f56a6',
+  'format' : 'iframe',
+  'height' : 60,
+  'width' : 468,
+  'params' : {}
+};
+</script>
+<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+</div>
+
+<!-- ================= HEADER ================= -->
+<div class="page-header">
+  <h2>Video Downloader</h2>
+  <p>Paste your video link below</p>
+</div>
+
+<!-- ================= DOWNLOAD BOX ================= -->
+<div class="download-box">
+  <input type="text" id="videoURL" placeholder="Paste video URL here...">
+  <button class="btn green" onclick="detectVideo()">Detect Video</button>
+</div>
+
+<!-- ================= RESULT AREA ================= -->
+<div id="result" class="result-box" style="display:none;">
+  <h3>Download Options</h3>
+  <select id="quality">
+    <option value="360p">360p</option>
+    <option value="720p">720p</option>
+    <option value="1080p">1080p</option>
+    <option value="mp3">MP3 Audio</option>
+  </select>
+  <button class="btn blue" onclick="startDownload()">Download</button>
+</div>
+
+<!-- ================= NOTE ================= -->
+<div class="note">
+  <p>⚠ YouTube videos are watch-only. Download is disabled.</p>
+</div>
+
+<!-- ================= NATIVE AD ================= -->
+<div class="ad-native">
+<script async="async" data-cfasync="false"
+src="https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js"></script>
+<div id="container-ae3f15925d8f1944704e01860015491c"></div>
+</div>
+
+<!-- ================= BOTTOM BANNER (320x50) ================= -->
+<div class="ad-box center">
+<script>
+atOptions = {
+  'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+  'format' : 'iframe',
+  'height' : 50,
+  'width' : 320,
+  'params' : {}
+};
+</script>
+<script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="ads.js"></script>
+
+<script>
+function detectVideo(){
+  const url = document.getElementById("videoURL").value.trim();
+  if(!url){
+    alert("Please paste a video URL!");
+    return;
+  }
+
+  if(url.includes("youtube.com") || url.includes("youtu.be")){
+    alert("YouTube is watch-only. Download disabled.");
+    document.getElementById("result").style.display="none";
+  }else{
+    document.getElementById("result").style.display="block";
+  }
+}
+
+function startDownload(){
+  const url = document.getElementById("videoURL").value.trim();
+  const quality = document.getElementById("quality").value;
+
+  if(!url){
+    alert("No video URL found!");
+    return;
+  }
+
+  // Fake download API placeholder
+  // Real API later plug-in
+
+  alert("Download started for:\n" + url + "\nQuality: " + quality);
+
+  // Save in history
+  let history = JSON.parse(localStorage.getItem("lsr_history") || "[]");
+  history.push({
+    url: url,
+    quality: quality,
+    time: new Date().toLocaleString()
+  });
+  localStorage.setItem("lsr_history", JSON.stringify(history));
+}
+</script>
+
+</body>
+</html>
