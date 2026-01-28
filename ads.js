@@ -1,54 +1,123 @@
-// ================= Page-specific Adsterra banners =================
-const pageAds = {
+// ================= Page-specific script ads =================
+const pageAdsScripts = {
   "index.html": {
-    top: [
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}, // 320x50
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60}, // 468x60
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}  // 728x90
+    top:[
+      `<script>
+      atOptions = {
+        'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : '3f673e5d02626eb857acc774c36f56a6',
+        'format' : 'iframe',
+        'height' : 60,
+        'width' : 468,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : 'd3ba86d4abd7cc73ecbfe82be6839a80',
+        'format' : 'iframe',
+        'height' : 90,
+        'width' : 728,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>`
     ],
-    bottom: [
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250}
+    bottom:[
+      `<script>
+      atOptions = {
+        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
+
+      `<script>
+      atOptions = {
+        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
+        'format' : 'iframe',
+        'height' : 250,
+        'width' : 300,
+        'params' : {}
+      };
+      </script>
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`
     ]
-  },
-  "downloader.html": { top:[], bottom:[] },
-  "browser.html": { top:[], bottom:[] },
-  "blog.html": { top:[], bottom:[] },
-  "news.html": { top:[], bottom:[] },
-  "earn.html": { top:[], bottom:[] }
+  }
 };
 
-// ================= Load Adsterra iframe banner =================
-function loadIframeAd(container, ad){
-  container.innerHTML="";
-  const iframe = document.createElement("iframe");
-  iframe.src=`https://www.highperformanceformat.com/${ad.key}/invoke.js`;
-  iframe.width=ad.w;
-  iframe.height=ad.h;
-  iframe.frameBorder=0;
-  iframe.scrolling="no";
-  iframe.style.border="0";
-  iframe.style.overflow="hidden";
-  container.appendChild(iframe);
+// ================= Inject Ads Scripts =================
+function injectScripts(containerId, scripts){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  container.innerHTML = "";
+  scripts.forEach(code=>{
+    const s = document.createElement("div");
+    s.innerHTML = code;
+    container.appendChild(s);
+  });
 }
 
-// ================= Load all banners for current page =================
+// ================= Load all ads =================
 function loadAllAds(){
   const page = window.location.pathname.split("/").pop() || "index.html";
-  const ads = pageAds[page];
+  const ads = pageAdsScripts[page];
   if(!ads) return;
 
-  ads.top.forEach((ad,i)=>{
-    const el=document.getElementById(`ad-top-${i+1}`);
-    if(el) loadIframeAd(el,ad);
+  ads.top.forEach((code,i)=>{
+    injectScripts(`ad-top-${i+1}`, [code]);
   });
 
-  ads.bottom.forEach((ad,i)=>{
-    const el=document.getElementById(`ad-bottom-${i+1}`);
-    if(el) loadIframeAd(el,ad);
+  ads.bottom.forEach((code,i)=>{
+    injectScripts(`ad-bottom-${i+1}`, [code]);
   });
 }
 
@@ -61,9 +130,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 // ================= Smartlink click-only =================
 const page = window.location.pathname.split("/").pop() || "index.html";
 
-// Downloader page smartlink
 if(page==="downloader.html"){
-  const dlBtn=document.getElementById("downloadBtn");
+  const dlBtn = document.getElementById("downloadBtn");
   if(dlBtn){
     dlBtn.addEventListener("click",()=>{
       if(!sessionStorage.getItem("dlSmartlink")){
@@ -74,12 +142,11 @@ if(page==="downloader.html"){
   }
 }
 
-// Click & Earn smartlink
 if(page==="earn.html"){
-  const taskBtn=document.getElementById("doTaskBtn");
+  const taskBtn = document.getElementById("doTaskBtn");
   if(taskBtn){
     taskBtn.addEventListener("click",()=>{
       window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
     });
   }
-}
+});
