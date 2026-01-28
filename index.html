@@ -2,42 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LSR Downloader</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header>LSR Downloader</header>
+  <header>
+    <h1>LSR Downloader</h1>
+  </header>
 
   <!-- Top 3 Banner Ads -->
-  <div class="banner-container top-banners">
-    <div class="banner" id="ad-top-1"></div>
-    <div class="banner" id="ad-top-2"></div>
-    <div class="banner" id="ad-top-3"></div>
+  <div class="banner-container">
+    <div id="ad-top-1" class="ad-slot"></div>
+    <div id="ad-top-2" class="ad-slot"></div>
+    <div id="ad-top-3" class="ad-slot"></div>
   </div>
 
-  <!-- Navigation Buttons -->
-  <div class="nav-buttons">
-    <a href="downloader.html" class="btn-realistic">Downloader</a>
-    <a href="browser.html" class="btn-realistic">Browser</a>
-    <a href="blog.html" class="btn-realistic">Blog</a>
-    <a href="news.html" class="btn-realistic">News</a>
-    <a href="earn.html" class="btn-realistic">Click & Earn</a>
+  <!-- Buttons -->
+  <div class="buttons-container">
+    <button onclick="window.location.href='downloader.html'">Downloader</button>
+    <button onclick="window.location.href='browser.html'">Browser</button>
+    <button onclick="window.location.href='blog.html'">Blog</button>
+    <button onclick="window.location.href='news.html'">News</button>
+    <button onclick="window.location.href='earn.html'">Click & Earn</button>
   </div>
 
   <!-- Bottom 5 Banner Ads -->
-  <div class="banner-container bottom-banners">
-    <div class="banner" id="ad-bottom-1"></div>
-    <div class="banner" id="ad-bottom-2"></div>
-    <div class="banner" id="ad-bottom-3"></div>
-    <div class="banner" id="ad-bottom-4"></div>
-    <div class="banner" id="ad-bottom-5"></div>
+  <div class="banner-container">
+    <div id="ad-bottom-1" class="ad-slot"></div>
+    <div id="ad-bottom-2" class="ad-slot"></div>
+    <div id="ad-bottom-3" class="ad-slot"></div>
+    <div id="ad-bottom-4" class="ad-slot"></div>
+    <div id="ad-bottom-5" class="ad-slot"></div>
   </div>
 
-  <!-- Footer -->
-  <footer>© 2026 LSR Earning Point. All Rights Reserved.</footer>
+  <footer>
+    &copy; 2026 LSR Earning Point
+  </footer>
 
-  <!-- Ads JS -->
   <script src="ads.js"></script>
 </body>
 </html>
