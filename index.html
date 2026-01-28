@@ -5,9 +5,15 @@
 <title>LSR Video Downloader</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
+
+<!-- Monetag In-Page Push + Vignette (Load once per page) -->
+<script>
+(function(s){
+  s.dataset.zone='10519506';
+  s.src='https://nap5k.com/tag.min.js';
+})([document.documentElement, document.body].filter(Boolean).pop()
+.appendChild(document.createElement('script')))
+</script>
 </head>
 <body>
 
@@ -36,7 +42,6 @@ atOptions = {
   <a href="download.html" class="btn green">Download</a>
   <a href="browser.html" class="btn blue">Browse</a>
   <a href="history.html" class="btn orange">History</a>
-  <a href="javascript:void(0)" class="btn red" id="xxxBtn">XXX</a>
 </div>
 
 <!-- ================= MORE BUTTON ================= -->
@@ -46,7 +51,8 @@ atOptions = {
 
 <!-- ================= NATIVE AD (4:1) ================= -->
 <div class="ad-native">
-
+<script async="async" data-cfasync="false"
+src="https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js"></script>
 <div id="container-ae3f15925d8f1944704e01860015491c"></div>
 </div>
 
@@ -96,33 +102,6 @@ atOptions = {
 
 <!-- ================= ADS CORE (Already Added) ================= -->
 <script src="ads.js"></script>
-<script>
-document.getElementById("xxxBtn").addEventListener("click", function () {
-  if (window.monetagLoaded) return;
-
-  window.monetagLoaded = true;
-
-  const s = document.createElement("script");
-  s.dataset.zone = "10519506";
-  s.src = "https://nap5k.com/tag.min.js";
-  document.body.appendChild(s);
-});
-</script>
-
-<script>
-function loadNativeAd(){
-  if(window.__nativeLoaded) return;
-  window.__nativeLoaded = true;
-
-  const s = document.createElement("script");
-  s.async = true;
-  s.setAttribute("data-cfasync","false");
-  s.src = "https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js";
-  document.body.appendChild(s);
-}
-
-document.getElementById("xxxBtn").addEventListener("click", loadNativeAd);
-</script>
 
 </body>
 </html>
