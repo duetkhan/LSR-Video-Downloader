@@ -46,8 +46,7 @@ atOptions = {
 
 <!-- ================= NATIVE AD (4:1) ================= -->
 <div class="ad-native">
-<script async="async" data-cfasync="false"
-src="https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js"></script>
+
 <div id="container-ae3f15925d8f1944704e01860015491c"></div>
 </div>
 
@@ -108,6 +107,21 @@ document.getElementById("xxxBtn").addEventListener("click", function () {
   s.src = "https://nap5k.com/tag.min.js";
   document.body.appendChild(s);
 });
+</script>
+
+<script>
+function loadNativeAd(){
+  if(window.__nativeLoaded) return;
+  window.__nativeLoaded = true;
+
+  const s = document.createElement("script");
+  s.async = true;
+  s.setAttribute("data-cfasync","false");
+  s.src = "https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js";
+  document.body.appendChild(s);
+}
+
+document.getElementById("xxxBtn").addEventListener("click", loadNativeAd);
 </script>
 
 </body>
