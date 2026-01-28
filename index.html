@@ -25,7 +25,7 @@
       <button id="download-btn" class="trigger-ad">Download</button>
     </div>
 
-    <!-- Bottom Banners (4–5) -->
+    <!-- Bottom Banners (4-5) -->
     <div class="bottom-banners">
       <div id="ad-bottom-1"></div>
       <div id="ad-bottom-2"></div>
@@ -39,30 +39,15 @@
     <p>&copy; 2026 LSR Video Downloader</p>
   </footer>
 
-  <!-- Ads JS -->
+  <!-- JS Files -->
+  <script src="browser.js"></script>
   <script src="ads.js"></script>
+  <script src="sw.js"></script>
 
   <script>
-    // ===============================
-    // Load banners manually (safe)
-    // ===============================
-    document.addEventListener("DOMContentLoaded", () => {
-      // Top banners
-      loadAdsterra("ad-top-1", "https://example.com/ad1.js");
-      loadAdsterra("ad-top-2", "https://example.com/ad2.js");
-      loadAdsterra("ad-top-3", "https://example.com/ad3.js");
-
-      // Bottom banners
-      loadAdsterra("ad-bottom-1", "https://example.com/ad4.js");
-      loadAdsterra("ad-bottom-2", "https://example.com/ad5.js");
-      loadAdsterra("ad-bottom-3", "https://example.com/ad6.js");
-      loadAdsterra("ad-bottom-4", "https://example.com/ad7.js");
-      loadAdsterra("ad-bottom-5", "https://example.com/ad8.js");
-    });
-
     // Optional: Download button triggers SmartLink safely
     document.getElementById("download-btn").addEventListener("click", () => {
-      if (typeof openSmartLinkOnClick === "function") {
+      if(typeof openSmartLinkOnClick === "function") {
         openSmartLinkOnClick();
       }
     });
