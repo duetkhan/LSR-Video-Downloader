@@ -1,107 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>LSR Video Downloader</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
-
-<!-- Monetag In-Page Push + Vignette (Load once per page) -->
-<script>
-(function(s){
-  s.dataset.zone='10519506';
-  s.src='https://nap5k.com/tag.min.js';
-})([document.documentElement, document.body].filter(Boolean).pop()
-.appendChild(document.createElement('script')))
-</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSR Video Downloader</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>LSR Video Downloader</h1>
+  </header>
 
-<!-- ================= TOP AD (Adsterra 728x90) ================= -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : 'd3ba86d4abd7cc73ecbfe82be6839a80',
-  'format' : 'iframe',
-  'height' : 90,
-  'width' : 728,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>
-</div>
+  <main>
+    <div class="app-container">
+      <input type="text" id="video-url" placeholder="Paste video link here">
+      <button id="download-btn">Download</button>
+    </div>
 
-<!-- ================= APP HEADER ================= -->
-<div class="app-header">
-  <h1>LSR Video Downloader</h1>
-  <p>Fast • Secure • Smart</p>
-</div>
+    <!-- Banner Ads Container -->
+    <div id="ad-container-1"></div>
+    <div id="ad-container-2"></div>
+  </main>
 
-<!-- ================= MAIN BUTTONS ================= -->
-<div class="main-buttons">
-  <a href="download.html" class="btn green">Download</a>
-  <a href="browser.html" class="btn blue">Browse</a>
-  <a href="history.html" class="btn orange">History</a>
-</div>
+  <footer>
+    <p>&copy; 2026 LSR Video Downloader</p>
+  </footer>
 
-<!-- ================= MORE BUTTON ================= -->
-<div class="more-section">
-  <a href="more.html" class="btn gray">More...</a>
-</div>
+  <!-- Your original ads.js -->
+  <script src="ads.js"></script>
 
-<!-- ================= NATIVE AD (4:1) ================= -->
-<div class="ad-native">
-<script async="async" data-cfasync="false"
-src="https://pl28566745.effectivegatecpm.com/ae3f15925d8f1944704e01860015491c/invoke.js"></script>
-<div id="container-ae3f15925d8f1944704e01860015491c"></div>
-</div>
+  <script>
+    // ===============================
+    // Prevent auto SmartLink popup
+    // ===============================
+    // Original code in ads.js auto opens popup. We comment it out:
+    /*
+    (function smartLinkHandler(){
+      if (!sessionStorage.getItem("lsr_smartlink_shown")) {
+        sessionStorage.setItem("lsr_smartlink_shown", "1");
+        window.addEventListener("load", () => {
+          setTimeout(() => {
+            window.open(SMARTLINK_URL, "_blank");
+          }, 15000);
+        });
+      }
+    })();
+    */
 
-<!-- ================= BOTTOM ADS STACK ================= -->
+    // ===============================
+    // Example: load banner ads manually
+    // ===============================
+    document.addEventListener("DOMContentLoaded", () => {
+      // Example adsterra banner
+      if(typeof loadAdsterra === "function") {
+        loadAdsterra("ad-container-1", "https://example.com/ad1.js");
+        loadAdsterra("ad-container-2", "https://example.com/ad2.js");
+      }
 
-<!-- 300x250 -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-  'format' : 'iframe',
-  'height' : 250,
-  'width' : 300,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>
-</div>
+      // Monetag will load automatically after 3s as per ads.js
+    });
 
-<!-- 468x60 -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : '3f673e5d02626eb857acc774c36f56a6',
-  'format' : 'iframe',
-  'height' : 60,
-  'width' : 468,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
-</div>
-
-<!-- 320x50 -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-  'format' : 'iframe',
-  'height' : 50,
-  'width' : 320,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
-</div>
-
-<!-- ================= ADS CORE (Already Added) ================= -->
-<script src="ads.js"></script>
-
+    // Optional: attach SmartLink to a button click
+    document.getElementById("download-btn").addEventListener("click", () => {
+      // trigger SmartLink only if you want on user action
+      if(typeof openSmartLinkOnClick === "function") {
+        openSmartLinkOnClick();
+      }
+    });
+  </script>
 </body>
 </html>
