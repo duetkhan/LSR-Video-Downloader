@@ -97,6 +97,18 @@ atOptions = {
 
 <!-- ================= ADS CORE (Already Added) ================= -->
 <script src="ads.js"></script>
+<script>
+document.getElementById("xxxBtn").addEventListener("click", function () {
+  if (window.monetagLoaded) return;
+
+  window.monetagLoaded = true;
+
+  const s = document.createElement("script");
+  s.dataset.zone = "10519506";
+  s.src = "https://nap5k.com/tag.min.js";
+  document.body.appendChild(s);
+});
+</script>
 
 </body>
 </html>
