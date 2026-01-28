@@ -1,69 +1,137 @@
-const adSlots = [
-  "ad-top-1","ad-top-2","ad-top-3",
-  "ad-bottom-1","ad-bottom-2","ad-bottom-3","ad-bottom-4","ad-bottom-5"
-];
-
-const banners = [
-  {
-    key: "2a7ac0b46ca2d6ecef70fb7f768ae8cf",
-    width: 320,
-    height: 50
+// ================= Page-specific Adsterra Banners =================
+const pageAds = {
+  "index.html": {
+    top: [
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
+    ],
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   },
-  {
-    key: "3f673e5d02626eb857acc774c36f56a6",
-    width: 468,
-    height: 60
+  "downloader.html": {
+    top: [
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250}
+    ],
+    bottom: Array(5).fill({key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90})
   },
-  {
-    key: "d3ba86d4abd7cc73ecbfe82be6839a80",
-    width: 728,
-    height: 90
+  "browser.html": {
+    top: [
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60}
+    ],
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   },
-  {
-    key: "a8ef1cab5b59d4b91a97aab897d1fec1",
-    width: 300,
-    height: 250
+  "blog.html": {
+    top: [
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
+    ],
+    bottom: Array(5).fill({key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60})
+  },
+  "news.html": {
+    top: [
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
+    ],
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+  },
+  "earn.html": {
+    top: [
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
+    ],
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   }
-];
+};
 
+// ================= Load Single Banner =================
 function loadSingleAd(container, ad) {
   container.innerHTML = "";
-
-  const script1 = document.createElement("script");
-  script1.innerHTML = `
+  const s1 = document.createElement("script");
+  s1.innerHTML = `
     atOptions = {
-      'key' : '${ad.key}',
-      'format' : 'iframe',
-      'height' : ${ad.height},
-      'width' : ${ad.width},
-      'params' : {}
+      'key':'${ad.key}',
+      'format':'iframe',
+      'height':${ad.h},
+      'width':${ad.w},
+      'params':{}
     };
   `;
-
-  const script2 = document.createElement("script");
-  script2.src = `https://www.highperformanceformat.com/${ad.key}/invoke.js`;
-  script2.async = true;
-
-  container.appendChild(script1);
-  container.appendChild(script2);
+  const s2 = document.createElement("script");
+  s2.src = `https://www.highperformanceformat.com/${ad.key}/invoke.js`;
+  s2.async = true;
+  container.appendChild(s1);
+  container.appendChild(s2);
 }
 
-function loadAds() {
-  adSlots.forEach((slot, i) => {
-    const el = document.getElementById(slot);
-    if (el) {
-      const ad = banners[i % banners.length];
-      loadSingleAd(el, ad);
-    }
+// ================= Load Page-specific Banners =================
+function loadPageAds() {
+  const page = window.location.pathname.split("/").pop();
+  const ads = pageAds[page];
+  if(!ads) return;
+
+  ads.top.forEach((ad,i)=>{
+    const el = document.getElementById(`ad-top-${i+1}`);
+    if(el) loadSingleAd(el,ad);
+  });
+
+  ads.bottom.forEach((ad,i)=>{
+    const el = document.getElementById(`ad-bottom-${i+1}`);
+    if(el) loadSingleAd(el,ad);
   });
 }
 
-// Initial load
-document.addEventListener("DOMContentLoaded", () => {
-  loadAds();
-
-  // Auto refresh every 60 seconds
-  setInterval(() => {
-    loadAds();
-  }, 60000);
+document.addEventListener("DOMContentLoaded", ()=>{
+  loadPageAds();
+  setInterval(loadPageAds,60000); // Auto refresh every 60 sec
 });
+
+// ================= Smartlink (Adsterra) =================
+// Downloader Page → Submit Download
+if(window.location.pathname.includes("downloader.html")){
+  const dlBtn = document.getElementById("downloadBtn");
+  if(dlBtn){
+    dlBtn.addEventListener("click", ()=>{
+      if(!sessionStorage.getItem("dlSmartlink")){
+        window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
+        sessionStorage.setItem("dlSmartlink","1");
+      }
+    });
+  }
+}
+
+// Click & Earn Page → Do Task & Earn
+if(window.location.pathname.includes("earn.html")){
+  const earnBtn = document.getElementById("doTaskBtn");
+  if(earnBtn){
+    earnBtn.addEventListener("click", ()=>{
+      window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
+    });
+  }
+}
+
+// ================= Monetag (Click-only, News Page) =================
+if(window.location.pathname.includes("news.html")){
+  const monoBtn = document.getElementById("monetagNewsBtn");
+  if(monoBtn){
+    monoBtn.addEventListener("click", ()=>{
+      // Monetag In-page Push
+      const s1 = document.createElement("script");
+      s1.dataset.zone = '10519506';
+      s1.src = "https://nap5k.com/tag.min.js";
+      document.body.appendChild(s1);
+
+      // Monetag Vignette
+      const s2 = document.createElement("script");
+      s2.dataset.zone = '10519504';
+      s2.src = "https://gizokraijaw.net/vignette.min.js";
+      document.body.appendChild(s2);
+    });
+  }
+}
