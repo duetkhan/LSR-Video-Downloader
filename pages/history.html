@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Download History - LSR</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header>Download History</header>
+
+  <div class="nav-buttons">
+    <a href="index.html">Home</a>
+    <a href="downloader.html">Downloader</a>
+    <a href="browser.html">Browser</a>
+    <a href="blog.html">Blog</a>
+    <a href="news.html">News</a>
+    <a href="clickearn.html">Click & Earn</a>
+  </div>
+
+  <div style="max-width:700px; margin:auto; padding:20px;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="border:1px solid #ccc; padding:8px;">Date</th>
+          <th style="border:1px solid #ccc; padding:8px;">Link</th>
+          <th style="border:1px solid #ccc; padding:8px;">Quality</th>
+        </tr>
+      </thead>
+      <tbody id="history-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Ads -->
+  <div class="ad-container" data-ad='<script>atOptions = {"key":"a8ef1cab5b59d4b91a97aab897d1fec1","format":"iframe","height":250,"width":300,"params":{}};</script><script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>'></div>
+
+  <footer>© 2026 LSR Earning Point</footer>
+  <script src="../assets/js/main.js"></script>
+  <script>
+    // Load history
+    const table = document.getElementById('history-table');
+    let history = JSON.parse(localStorage.getItem('lsr_history')||'[]');
+    history.forEach(item=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td style="border:1px solid #ccc; padding:8px;">${item.date}</td>
+                    <td style="border:1px solid #ccc; padding:8px;">${item.link}</td>
+                    <td style="border:1px solid #ccc; padding:8px;">${item.quality}</td>`;
+      table.appendChild(tr);
+    });
+  </script>
+</body>
+</html>
