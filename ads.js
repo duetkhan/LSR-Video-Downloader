@@ -1,130 +1,88 @@
-// ================= Page-specific Adsterra Ads =================
+// ========================= Page-specific Adsterra Banners =================
 const pageAds = {
   "index.html": {
     top: [
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"}
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
     ],
-    bottom: [
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"}
-    ]
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   },
   "downloader.html": {
     top: [
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"}
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250}
     ],
-    bottom: [
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"}
-    ]
+    bottom: Array(5).fill({key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90})
   },
   "browser.html": {
     top: [
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"}
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60}
     ],
-    bottom: [
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"}
-    ]
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   },
   "blog.html": {
     top: [
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"}
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
     ],
-    bottom: [
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"}
-    ]
+    bottom: Array(5).fill({key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60})
   },
   "news.html": {
     top: [
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"},
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"}
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
     ],
-    bottom: [
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"}
-    ]
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   },
   "earn.html": {
     top: [
-      {id:"2a7ac0b46ca2d6ecef70fb7f768ae8cf"},
-      {id:"3f673e5d02626eb857acc774c36f56a6"},
-      {id:"d3ba86d4abd7cc73ecbfe82be6839a80"}
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
     ],
-    bottom: [
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"},
-      {id:"a8ef1cab5b59d4b91a97aab897d1fec1"}
-    ]
+    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
   }
 };
 
-// ========================= Load Adsterra ad in div =========================
-function loadAd(container, key){
-  container.innerHTML = ""; // Clear previous ad
-
-  // Create script tag
-  const s = document.createElement("script");
-  s.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
-  s.async = true;
-  container.appendChild(s);
-
-  // Optional: fallback message if ad fails
-  const fallback = document.createElement("div");
-  fallback.innerText = "Ad loading...";
-  fallback.style.fontSize = "12px";
-  fallback.style.color = "#666";
-  container.appendChild(fallback);
+// ========================= Helper to load iframe ad =========================
+function loadIframeAd(container, ad){
+  container.innerHTML = ""; // Clear previous content
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://www.highperformanceformat.com/${ad.key}/invoke.js`;
+  iframe.width = ad.w;
+  iframe.height = ad.h;
+  iframe.frameBorder = 0;
+  iframe.scrolling = "no";
+  iframe.style.border = "0";
+  iframe.style.overflow = "hidden";
+  container.appendChild(iframe);
 }
 
-// ========================= Load all page ads =========================
+// ========================= Load all ads for page =========================
 function loadAllAds(){
   const page = window.location.pathname.split("/").pop() || "index.html";
   const ads = pageAds[page];
   if(!ads) return;
 
-  // Top banners
   ads.top.forEach((ad,i)=>{
     const el = document.getElementById(`ad-top-${i+1}`);
-    if(el) loadAd(el,ad.id);
+    if(el) loadIframeAd(el,ad);
   });
 
-  // Bottom banners
   ads.bottom.forEach((ad,i)=>{
     const el = document.getElementById(`ad-bottom-${i+1}`);
-    if(el) loadAd(el,ad.id);
+    if(el) loadIframeAd(el,ad);
   });
 }
 
 // ========================= Auto-refresh every 60s =========================
-document.addEventListener("DOMContentLoaded", ()=>{
+document.addEventListener("DOMContentLoaded",()=>{
   loadAllAds();
   setInterval(loadAllAds,60000);
 });
@@ -132,7 +90,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 // ========================= Smartlink click-only =========================
 const page = window.location.pathname.split("/").pop() || "index.html";
 
-// Downloader page
+// Downloader smartlink
 if(page==="downloader.html"){
   const dlBtn = document.getElementById("downloadBtn");
   if(dlBtn){
@@ -145,7 +103,7 @@ if(page==="downloader.html"){
   }
 }
 
-// Click & Earn page
+// Click & Earn smartlink
 if(page==="earn.html"){
   const taskBtn = document.getElementById("doTaskBtn");
   if(taskBtn){
