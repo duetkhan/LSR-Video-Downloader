@@ -1,48 +1,68 @@
-/* ================= ADS.JS ================= */
-/* Monetag + Adsterra SmartLink + Banner refresh + per-session control */
+/* ==================================================
+   LSR Video Downloader – Ads Master Controller
+   Adsterra + Monetag Full Integration
+   100% Safe + Live + Session Controlled
+================================================== */
 
-(function(){
-  // ===== BANNER REFRESH =====
-  const refreshInterval = 60000; // 60 sec
-  const banners = document.querySelectorAll(".ad-box iframe");
-  
-  function refreshBanners(){
-    banners.forEach((iframe)=>{
-      let src = iframe.src;
-      iframe.src = src;
+/* ========== CONFIG ========== */
+const SMARTLINK_URL = "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f";
+const MONETAG_ZONE = "10519506";
+
+/* ========== SMARTLINK (1 TIME PER SESSION) ========== */
+(function smartLinkHandler(){
+  if (!sessionStorage.getItem("lsr_smartlink_shown")) {
+    sessionStorage.setItem("lsr_smartlink_shown", "1");
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        window.open(SMARTLINK_URL, "_blank");
+      }, 15000); // 15 seconds delay (safe for ban)
     });
   }
-  
-  setInterval(refreshBanners, refreshInterval);
-
-  // ===== SMARTLINK PER SESSION =====
-  const smartLinkKey = 'lsr_smartlink_shown';
-  const smartLinkUrl = 'https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f';
-
-  function triggerSmartLink(){
-    if(!sessionStorage.getItem(smartLinkKey)){
-      sessionStorage.setItem(smartLinkKey, '1');
-      window.open(smartLinkUrl, '_blank');
-    }
-  }
-
-  // ===== TRIGGERS =====
-  // Homepage: More button
-  const moreBtn = document.querySelector('.more-box button');
-  if(moreBtn) moreBtn.addEventListener('click', triggerSmartLink);
-
-  // Download button click
-  const downloadBtns = document.querySelectorAll('.btn.blue');
-  downloadBtns.forEach(btn => btn.addEventListener('click', triggerSmartLink));
-
-  // New tab in browser triggers
-  const newTabBtn = document.querySelector('button[onclick="newTab()"]');
-  if(newTabBtn) newTabBtn.addEventListener('click', triggerSmartLink);
-
-  // ===== MONETAG ADDITIONAL LOGIC =====
-  // Placeholder if future Monetag in-app unlock needed
-  window.addEventListener('load', ()=>{
-    console.log("Ads.js initialized: banners auto-refresh + SmartLink ready");
-  });
-
 })();
+
+/* ========== MONETAG LOADER ========== */
+function loadMonetag() {
+  if (window.monetagLoaded) return;
+  window.monetagLoaded = true;
+
+  const script = document.createElement("script");
+  script.dataset.zone = MONETAG_ZONE;
+  script.src = "https://nap5k.com/tag.min.js";
+  script.async = true;
+  document.body.appendChild(script);
+
+  console.log("Monetag Loaded");
+}
+
+/* Auto load Monetag */
+window.addEventListener("load", () => {
+  setTimeout(loadMonetag, 3000);
+});
+
+/* ========== BANNER RELOAD SYSTEM ========== */
+function loadAdsterra(containerId, scriptSrc) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.innerHTML = "";
+  const s = document.createElement("script");
+  s.src = scriptSrc;
+  s.async = true;
+  container.appendChild(s);
+}
+
+/* ========== CLICK-TRIGGER SMARTLINK (OPTIONAL EXTRA MONETIZATION) ========== */
+function openSmartLinkOnClick() {
+  window.open(SMARTLINK_URL, "_blank");
+}
+
+/* ========== SAFE INTERACTION ADS (BUTTON / DOWNLOAD) ========== */
+document.addEventListener("click", function(e){
+  if (e.target.classList.contains("trigger-ad")) {
+    openSmartLinkOnClick();
+  }
+});
+
+/* ========== ADS DEBUG LOG ========== */
+console.log("LSR Ads System Loaded Successfully");
