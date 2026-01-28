@@ -2,11 +2,17 @@
 const pageAds = {
   "index.html": {
     top: [
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
+      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}, // 320x50
+      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60}, // 468x60
+      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}  // 728x90
     ],
-    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+    bottom: [
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
+      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250}
+    ]
   },
   "downloader.html": { top:[], bottom:[] },
   "browser.html": { top:[], bottom:[] },
@@ -68,7 +74,7 @@ if(page==="downloader.html"){
   }
 }
 
-// Click & Earn page smartlink
+// Click & Earn smartlink
 if(page==="earn.html"){
   const taskBtn=document.getElementById("doTaskBtn");
   if(taskBtn){
