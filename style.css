@@ -1,62 +1,77 @@
 body {
-  margin:0;
-  background:linear-gradient(135deg,#050f08,#0a3d2e);
-  font-family:Arial, sans-serif;
-  color:white;
-  text-align:center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background: #f2f2f2;
+  color: #222;
 }
 
 header {
-  padding:15px;
-  background:rgba(0,0,0,.6);
-  font-size:22px;
-  letter-spacing:2px;
+  text-align: center;
+  font-size: 2.2em;
+  font-weight: bold;
+  padding: 20px;
+  background: linear-gradient(135deg, #16a085, #1abc9c);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
 }
 
-.ads-top, .ads-bottom {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:8px;
-  margin:10px 0;
+.nav-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 25px 0;
+  flex-wrap: wrap;
 }
 
-.ad-box {
-  background:#000;
-  border-radius:6px;
-  overflow:hidden;
-  min-width:300px;
-  min-height:50px;
+.nav-buttons a.btn-realistic {
+  text-decoration: none;
+  padding: 14px 28px;
+  background: linear-gradient(145deg,#1abc9c,#16a085);
+  color: #fff;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1em;
+  transition: 0.3s;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
-.home-buttons {
-  margin:25px 0;
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:15px;
-  padding:0 20px;
+.nav-buttons a.btn-realistic:hover {
+  background: linear-gradient(145deg,#16a085,#1abc9c);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
 }
 
-.home-buttons button {
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(135deg,#00ff9c,#00b37a);
-  font-size:16px;
-  font-weight:bold;
-  color:#002b1f;
-  cursor:pointer;
-  box-shadow:0 0 15px rgba(0,255,156,.4);
-  transition:.2s;
+.banner-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 15px 0;
 }
 
-.home-buttons button:hover {
-  transform:scale(1.05);
+.banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 320px;
+  max-width: 728px;
+  min-height: 50px;
+  margin: 10px;
+  border: 1px solid #ccc;
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 footer {
-  margin-top:20px;
-  padding:10px;
-  background:#000;
-  font-size:13px;
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+  color: #fff;
+  font-size: 0.9em;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0 -4px 6px rgba(0,0,0,0.2);
 }
