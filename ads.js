@@ -1,25 +1,12 @@
 /* ==================================================
    LSR Video Downloader – Ads Master Controller
    Adsterra + Monetag Full Integration
-   100% Safe + Live + Session Controlled
+   Safe, Click-Only SmartLink, Banner Ready
 ================================================== */
 
 /* ========== CONFIG ========== */
 const SMARTLINK_URL = "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f";
 const MONETAG_ZONE = "10519506";
-
-/* ========== SMARTLINK (1 TIME PER SESSION) ========== */
-(function smartLinkHandler(){
-  if (!sessionStorage.getItem("lsr_smartlink_shown")) {
-    sessionStorage.setItem("lsr_smartlink_shown", "1");
-
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        window.open(SMARTLINK_URL, "_blank");
-      }, 15000); // 15 seconds delay (safe for ban)
-    });
-  }
-})();
 
 /* ========== MONETAG LOADER ========== */
 function loadMonetag() {
@@ -35,12 +22,12 @@ function loadMonetag() {
   console.log("Monetag Loaded");
 }
 
-/* Auto load Monetag */
+// Auto load Monetag after 3s (safe)
 window.addEventListener("load", () => {
   setTimeout(loadMonetag, 3000);
 });
 
-/* ========== BANNER RELOAD SYSTEM ========== */
+/* ========== BANNER LOAD SYSTEM ========== */
 function loadAdsterra(containerId, scriptSrc) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -52,17 +39,19 @@ function loadAdsterra(containerId, scriptSrc) {
   container.appendChild(s);
 }
 
-/* ========== CLICK-TRIGGER SMARTLINK (OPTIONAL EXTRA MONETIZATION) ========== */
+/* ========== CLICK-TRIGGER SMARTLINK (SAFE) ========== */
 function openSmartLinkOnClick() {
-  window.open(SMARTLINK_URL, "_blank");
+  if (!sessionStorage.getItem("lsr_smartlink_shown")) {
+    sessionStorage.setItem("lsr_smartlink_shown", "1");
+    window.open(SMARTLINK_URL, "_blank");
+  }
 }
 
-/* ========== SAFE INTERACTION ADS (BUTTON / DOWNLOAD) ========== */
+/* ========== ATTACH CLICK EVENTS ========== */
 document.addEventListener("click", function(e){
   if (e.target.classList.contains("trigger-ad")) {
     openSmartLinkOnClick();
   }
 });
 
-/* ========== ADS DEBUG LOG ========== */
-console.log("LSR Ads System Loaded Successfully");
+console.log("LSR Ads System Loaded Successfully (Safe Mode)");
