@@ -1,99 +1,97 @@
-// ================= Page-specific Adsterra Banners =================
+// ========================= Page-specific Adsterra Banners =========================
 const pageAds = {
   "index.html": {
     top: [
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
+      "2a7ac0b46ca2d6ecef70fb7f768ae8cf",
+      "3f673e5d02626eb857acc774c36f56a6",
+      "d3ba86d4abd7cc73ecbfe82be6839a80"
     ],
-    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+    bottom: [
+      "a8ef1cab5b59d4b91a97aab897d1fec1",
+      "a8ef1cab5b59d4b91a97aab897d1fec1",
+      "a8ef1cab5b59d4b91a97aab897d1fec1",
+      "a8ef1cab5b59d4b91a97aab897d1fec1",
+      "a8ef1cab5b59d4b91a97aab897d1fec1"
+    ]
   },
   "downloader.html": {
-    top: [
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250}
-    ],
-    bottom: Array(5).fill({key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90})
+    top: ["3f673e5d02626eb857acc774c36f56a6","2a7ac0b46ca2d6ecef70fb7f768ae8cf","a8ef1cab5b59d4b91a97aab897d1fec1"],
+    bottom: ["d3ba86d4abd7cc73ecbfe82be6839a80","d3ba86d4abd7cc73ecbfe82be6839a80","d3ba86d4abd7cc73ecbfe82be6839a80","d3ba86d4abd7cc73ecbfe82be6839a80","d3ba86d4abd7cc73ecbfe82be6839a80"]
   },
   "browser.html": {
-    top: [
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60}
-    ],
-    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+    top: ["2a7ac0b46ca2d6ecef70fb7f768ae8cf","d3ba86d4abd7cc73ecbfe82be6839a80","3f673e5d02626eb857acc774c36f56a6"],
+    bottom: ["a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1"]
   },
   "blog.html": {
-    top: [
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
-      {key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250},
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
-    ],
-    bottom: Array(5).fill({key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60})
+    top: ["d3ba86d4abd7cc73ecbfe82be6839a80","a8ef1cab5b59d4b91a97aab897d1fec1","2a7ac0b46ca2d6ecef70fb7f768ae8cf"],
+    bottom: ["3f673e5d02626eb857acc774c36f56a6","3f673e5d02626eb857acc774c36f56a6","3f673e5d02626eb857acc774c36f56a6","3f673e5d02626eb857acc774c36f56a6","3f673e5d02626eb857acc774c36f56a6"]
   },
   "news.html": {
-    top: [
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90},
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50}
-    ],
-    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+    top: ["3f673e5d02626eb857acc774c36f56a6","d3ba86d4abd7cc73ecbfe82be6839a80","2a7ac0b46ca2d6ecef70fb7f768ae8cf"],
+    bottom: ["a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1"]
   },
   "earn.html": {
-    top: [
-      {key:"2a7ac0b46ca2d6ecef70fb7f768ae8cf", w:320,h:50},
-      {key:"3f673e5d02626eb857acc774c36f56a6", w:468,h:60},
-      {key:"d3ba86d4abd7cc73ecbfe82be6839a80", w:728,h:90}
-    ],
-    bottom: Array(5).fill({key:"a8ef1cab5b59d4b91a97aab897d1fec1", w:300,h:250})
+    top: ["2a7ac0b46ca2d6ecef70fb7f768ae8cf","3f673e5d02626eb857acc774c36f56a6","d3ba86d4abd7cc73ecbfe82be6839a80"],
+    bottom: ["a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1","a8ef1cab5b59d4b91a97aab897d1fec1"]
   }
 };
 
-// ================= Load Single Ad =================
-function loadSingleAd(container, ad) {
+// ========================= Helper to load a single ad =========================
+function loadAd(container, key){
   container.innerHTML = "";
-  const s1 = document.createElement("script");
-  s1.innerHTML = `
-    atOptions = {
-      'key':'${ad.key}',
-      'format':'iframe',
-      'height':${ad.h},
-      'width':${ad.w},
-      'params':{}
-    };
-  `;
-  const s2 = document.createElement("script");
-  s2.src = `https://www.highperformanceformat.com/${ad.key}/invoke.js`;
-  s2.async = true;
-  container.appendChild(s1);
-  container.appendChild(s2);
+  const s = document.createElement("script");
+  s.src = `https://www.highperformanceformat.com/${key}/invoke.js`;
+  s.async = true;
+  container.appendChild(s);
 }
 
-// ================= Load Page Ads =================
-function loadPageAds() {
+// ========================= Load All Ads =========================
+function loadAllAds(){
   const page = window.location.pathname.split("/").pop() || "index.html";
   const ads = pageAds[page];
   if(!ads) return;
 
-  ads.top.forEach((ad,i)=>{
+  // Top banners
+  ads.top.forEach((key,i)=>{
     const el = document.getElementById(`ad-top-${i+1}`);
-    if(el) loadSingleAd(el, ad);
+    if(el) loadAd(el,key);
   });
 
-  ads.bottom.forEach((ad,i)=>{
+  // Bottom banners
+  ads.bottom.forEach((key,i)=>{
     const el = document.getElementById(`ad-bottom-${i+1}`);
-    if(el) loadSingleAd(el, ad);
+    if(el) loadAd(el,key);
   });
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  loadPageAds();
-  setInterval(loadPageAds,60000); // Auto refresh every 60 sec
+// ========================= Auto refresh every 60s =========================
+document.addEventListener("DOMContentLoaded",()=>{
+  loadAllAds();
+  setInterval(loadAllAds,60000);
 });
 
-// ================= Smartlink (Downloader & Click & Earn) =================
-if(window.location.pathname.includes("downloader.html")){
+// ========================= Smartlink click-only =========================
+const page = window.location.pathname.split("/").pop() || "index.html";
+
+// Downloader page smartlink
+if(page==="downloader.html"){
   const dlBtn = document.getElementById("downloadBtn");
   if(dlBtn){
-    dlBtn.addEvent
+    dlBtn.addEventListener("click",()=>{
+      if(!sessionStorage.getItem("dlSmartlink")){
+        window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
+        sessionStorage.setItem("dlSmartlink","1");
+      }
+    });
+  }
+}
+
+// Click & Earn page smartlink
+if(page==="earn.html"){
+  const taskBtn = document.getElementById("doTaskBtn");
+  if(taskBtn){
+    taskBtn.addEventListener("click",()=>{
+      window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
+    });
+  }
+}
