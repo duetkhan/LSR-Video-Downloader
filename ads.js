@@ -1,4 +1,4 @@
-// ================= Page-specific script ads =================
+// ================= Page-specific Adsterra scripts =================
 const pageAdsScripts = {
   "index.html": {
     top:[
@@ -35,8 +35,7 @@ const pageAdsScripts = {
       </script>
       <script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>`
     ],
-    bottom:[
-      `<script>
+    bottom:Array(5).fill(`<script>
       atOptions = {
         'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
         'format' : 'iframe',
@@ -45,68 +44,23 @@ const pageAdsScripts = {
         'params' : {}
       };
       </script>
-      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
-
-      `<script>
-      atOptions = {
-        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-      </script>
-      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
-
-      `<script>
-      atOptions = {
-        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-      </script>
-      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
-
-      `<script>
-      atOptions = {
-        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-      </script>
-      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`,
-
-      `<script>
-      atOptions = {
-        'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-      </script>
-      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`
-    ]
+      <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>`)
   }
 };
 
-// ================= Inject Ads Scripts =================
+// ================= Inject scripts into container =================
 function injectScripts(containerId, scripts){
   const container = document.getElementById(containerId);
   if(!container) return;
   container.innerHTML = "";
   scripts.forEach(code=>{
-    const s = document.createElement("div");
-    s.innerHTML = code;
-    container.appendChild(s);
+    const div = document.createElement("div");
+    div.innerHTML = code;
+    container.appendChild(div);
   });
 }
 
-// ================= Load all ads =================
+// ================= Load all banners =================
 function loadAllAds(){
   const page = window.location.pathname.split("/").pop() || "index.html";
   const ads = pageAdsScripts[page];
@@ -115,13 +69,12 @@ function loadAllAds(){
   ads.top.forEach((code,i)=>{
     injectScripts(`ad-top-${i+1}`, [code]);
   });
-
   ads.bottom.forEach((code,i)=>{
     injectScripts(`ad-bottom-${i+1}`, [code]);
   });
 }
 
-// ================= Auto refresh every 60s =================
+// ================= Auto-refresh every 60s =================
 document.addEventListener("DOMContentLoaded",()=>{
   loadAllAds();
   setInterval(loadAllAds,60000);
