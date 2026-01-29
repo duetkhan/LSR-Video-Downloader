@@ -2,17 +2,6 @@
    LSR MAIN JS
    ========================= */
 
-/* --------- ADS AUTO REFRESH (60s) --------- */
-function reloadAds() {
-  const adBoxes = document.querySelectorAll(".ad-box");
-  adBoxes.forEach(box => {
-    const html = box.innerHTML;
-    box.innerHTML = "";
-    setTimeout(() => { box.innerHTML = html; }, 100);
-  });
-}
-setInterval(reloadAds, 60000);
-
 /* --------- DOWNLOAD HISTORY --------- */
 function getHistory() { return JSON.parse(localStorage.getItem("lsr_history")) || []; }
 function saveHistory(data) {
@@ -30,7 +19,7 @@ function startDownload() {
   saveHistory({ link, quality, time: new Date().toLocaleString() });
   alert("Download Started (Simulated)!\nQuality: " + quality);
 
-  // Smartlink only on click
+  // Smartlink only onclick
   window.open(
     "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
     "_blank"
