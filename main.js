@@ -1,34 +1,56 @@
-function go(p){location.href=p}
+/* =========================
+   LSR MAIN JS
+========================= */
 
-function openSmartlink(){
-  window.open(
-    "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
-    "_blank"
-  );
+/* DOWNLOAD HISTORY */
+function getHistory(){ return JSON.parse(localStorage.getItem("lsr_history")) || []; }
+function saveHistory(data){
+  let history = getHistory();
+  history.push(data);
+  localStorage.setItem("lsr_history", JSON.stringify(history));
 }
 
-function fakeDownload(){
-  const v=document.getElementById("vlink").value;
-  if(!v){alert("Enter video link");return;}
-  openSmartlink();
-  let h=JSON.parse(localStorage.getItem("dlHistory")||"[]");
-  h.push({url:v,date:new Date().toLocaleString()});
-  localStorage.setItem("dlHistory",JSON.stringify(h));
-  alert("Download started (demo)");
+/* DOWNLOADER */
+function startDownload(){
+  const link = document.getElementById("videoLink").value.trim();
+  const quality = document.getElementById("videoQuality").value;
+  if(!link){ alert("Please enter video link"); return; }
+  saveHistory({link, quality, time: new Date().toLocaleString()});
+  alert("Download Started (Simulated)\nQuality: "+quality);
+
+  window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank");
 }
 
-function loadHistory(){
-  let h=JSON.parse(localStorage.getItem("dlHistory")||"[]");
-  let ul=document.getElementById("history");
-  ul.innerHTML="";
-  h.forEach(i=>{
-    let li=document.createElement("li");
-    li.innerText=i.url+" — "+i.date;
-    ul.appendChild(li);
+/* HISTORY PAGE */
+function loadHistoryPage(){
+  const table = document.getElementById("historyTable");
+  if(!table) return;
+  let history = getHistory();
+  if(history.length===0){
+    table.innerHTML="<tr><td colspan='4'>No Download History Found</td></tr>";
+    return;
+  }
+  let rows="";
+  history.forEach((item,i)=>{
+    rows+=`<tr>
+      <td>${i+1}</td>
+      <td>${item.link}</td>
+      <td>${item.quality}</td>
+      <td>${item.time}</td>
+    </tr>`;
   });
+  table.innerHTML=rows;
 }
 
-function searchGoogle(){
-  const q=document.getElementById("search").value;
-  if(q) window.open("https://www.google.com/search?q="+encodeURIComponent(q),"_blank");
+/* MINI BROWSER */
+function browserSearch(){
+  const q = document.getElementById("browserSearch").value.trim();
+  if(!q){ alert("Type something"); return; }
+  window.open("https://www.google.com/search?q="+encodeURIComponent(q), "_blank");
 }
+
+/* CLICK & EARN */
+function openSmartLink(){ window.open("https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f","_blank"); }
+function openTelegram(){ window.open("https://t.me/bitbytee_bot","_blank"); }
+
+window.onload=function(){ loadHistoryPage(); };
