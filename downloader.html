@@ -1,83 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>LSR Video Downloader - Downloader</title>
+<title>Downloader</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="app">
 
-<header>
-  <h1>Downloader</h1>
-  <p>Paste your video link below</p>
-</header>
+<header><h1>Video Downloader</h1></header>
 
-<!-- TOP AD -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-  'format' : 'iframe',
-  'height' : 50,
-  'width' : 320,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+<div class="ads-top">…(same TOP ad as index.html)…</div>
+
+<div class="main">
+<input id="vlink" placeholder="Paste video link">
+<select>
+<option>360p</option><option>720p</option>
+<option>1080p</option><option>MP3</option>
+</select>
+<button class="btn" onclick="fakeDownload()">Download</button>
+<button class="btn secondary" onclick="go('history.html')">Download History</button>
 </div>
 
-<div class="menu">
-  <input type="text" id="videoLink" placeholder="Enter video link">
-  <select id="videoQuality">
-    <option value="360p">360p</option>
-    <option value="720p">720p</option>
-    <option value="1080p">1080p</option>
-    <option value="mp3">MP3</option>
-  </select>
-  <button class="btn" onclick="startDownload()">Submit Download</button>
-  <a href="history.html" class="btn">Download History</a>
-  <a href="index.html" class="btn">Back Home</a>
-</div>
+<div class="ads-bottom">…(same BOTTOM ads)…</div>
 
-<!-- BOTTOM ADS -->
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : '3f673e5d02626eb857acc774c36f56a6',
-  'format' : 'iframe',
-  'height' : 60,
-  'width' : 468,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+<footer>© LSR Earning Point</footer>
 </div>
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : 'd3ba86d4abd7cc73ecbfe82be6839a80',
-  'format' : 'iframe',
-  'height' : 90,
-  'width' : 728,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>
-</div>
-<div class="ad-box">
-<script>
-atOptions = {
-  'key' : 'a8ef1cab5b59d4b91a97aab897d1fec1',
-  'format' : 'iframe',
-  'height' : 250,
-  'width' : 300,
-  'params' : {}
-};
-</script>
-<script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>
-</div>
-
-<footer>© 2026 LSR Earning Point</footer>
 <script src="main.js"></script>
 </body>
 </html>
