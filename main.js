@@ -1,6 +1,4 @@
-function go(page){
-  window.location.href = page;
-}
+function go(p){location.href=p}
 
 function openSmartlink(){
   window.open(
@@ -10,32 +8,27 @@ function openSmartlink(){
 }
 
 function fakeDownload(){
-  const url=document.getElementById("vlink").value;
-  if(!url){
-    alert("Enter video link");
-    return;
-  }
+  const v=document.getElementById("vlink").value;
+  if(!v){alert("Enter video link");return;}
   openSmartlink();
-  let history=JSON.parse(localStorage.getItem("dlHistory")||"[]");
-  history.push({url:url,date:new Date().toLocaleString()});
-  localStorage.setItem("dlHistory",JSON.stringify(history));
+  let h=JSON.parse(localStorage.getItem("dlHistory")||"[]");
+  h.push({url:v,date:new Date().toLocaleString()});
+  localStorage.setItem("dlHistory",JSON.stringify(h));
   alert("Download started (demo)");
 }
 
 function loadHistory(){
-  const list=document.getElementById("history");
-  let history=JSON.parse(localStorage.getItem("dlHistory")||"[]");
-  list.innerHTML="";
-  history.forEach(h=>{
+  let h=JSON.parse(localStorage.getItem("dlHistory")||"[]");
+  let ul=document.getElementById("history");
+  ul.innerHTML="";
+  h.forEach(i=>{
     let li=document.createElement("li");
-    li.innerText=h.url+" — "+h.date;
-    list.appendChild(li);
+    li.innerText=i.url+" — "+i.date;
+    ul.appendChild(li);
   });
 }
 
 function searchGoogle(){
   const q=document.getElementById("search").value;
-  if(q){
-    window.open("https://www.google.com/search?q="+encodeURIComponent(q),"_blank");
-  }
+  if(q) window.open("https://www.google.com/search?q="+encodeURIComponent(q),"_blank");
 }
