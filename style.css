@@ -1,20 +1,21 @@
 /* =========================
    LSR GLOBAL STYLES
-========================= */
+   ========================= */
+
 html, body {
   margin: 0;
   padding: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  min-height: 100%;
   font-family: Arial, sans-serif;
   background: #0f0f0f;
   color: #fff;
+  overflow-x: hidden;
 }
 
 header {
   text-align: center;
-  padding: 20px 10px;
+  padding: 25px 10px;
   background: linear-gradient(90deg,#1a1a1a,#333);
 }
 
@@ -23,12 +24,18 @@ header h1 {
   font-size: 2.5em;
 }
 
+header p {
+  margin: 5px 0;
+  font-size: 1em;
+  color: #ccc;
+}
+
 .menu {
-  width: 100%;
-  height: calc(100% - 180px);
+  width: 90%;
+  max-width: 900px;
+  margin: 30px auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 20px;
 }
@@ -44,7 +51,7 @@ header h1 {
   text-align: center;
   font-size: 1.2em;
   transition: 0.3s;
-  width: 90%;
+  width: 100%;
   max-width: 350px;
 }
 
@@ -54,8 +61,7 @@ header h1 {
 }
 
 input, select {
-  width: 90%;
-  max-width: 350px;
+  width: 100%;
   padding: 14px;
   border-radius: 12px;
   border: none;
@@ -65,14 +71,40 @@ input, select {
 
 .ad-box {
   width: 100%;
+  margin: 15px 0;
   text-align: center;
-  margin: 10px 0;
 }
 
 footer {
   text-align: center;
-  padding: 15px 5px;
+  padding: 20px 5px;
   font-size: 0.9em;
   color: #888;
   background: #111;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background: linear-gradient(135deg,#ff512f,#dd2476);
+  color: #fff;
+}
+
+table tr:nth-child(even) {
+  background: rgba(255,255,255,0.05);
+}
+
+@media (max-width:600px) {
+  header h1 { font-size: 2em; }
+  .btn { max-width: 100%; padding: 14px 20px; font-size: 1em; }
+  .menu { width: 95%; }
 }
