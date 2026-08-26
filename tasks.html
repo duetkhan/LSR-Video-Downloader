@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,10 +27,6 @@
       color: inherit;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
     header {
       padding: 25px 15px;
       text-align: center;
@@ -47,10 +44,7 @@
       color: #ccc;
     }
 
-
-    /* =========================
-       USER BAR
-    ========================= */
+    /* USER BAR */
 
     .user-bar {
       max-width: 1000px;
@@ -67,9 +61,6 @@
       border-radius: 12px;
       border: 1px solid #333;
     }
-
-
-    /* LEFT */
 
     .user-left {
       display: flex;
@@ -89,9 +80,6 @@
       white-space: nowrap;
     }
 
-
-    /* RIGHT */
-
     .user-right {
       display: flex;
       align-items: center;
@@ -107,10 +95,7 @@
       white-space: nowrap;
     }
 
-
-    /* =========================
-       BUTTONS
-    ========================= */
+    /* BUTTONS */
 
     button,
     .nav-btn {
@@ -128,255 +113,166 @@
       font-size: 14px;
     }
 
-
     .login-btn {
       background: #2563eb;
       color: #fff;
     }
-
 
     .signup-btn {
       background: #16a34a;
       color: #fff;
     }
 
-
     .logout-btn {
       background: #555;
       color: #fff;
     }
 
-
     .withdraw-btn {
       background: #f59e0b;
       color: #111;
-
       font-weight: bold;
     }
 
-
-    /* =========================
-       MAIN
-    ========================= */
+    /* MAIN */
 
     .container {
       max-width: 1000px;
-
       margin: auto;
-
       padding: 10px 18px 40px;
     }
 
-
     .hero {
       text-align: center;
-
       padding: 20px 10px;
     }
 
-
     .hero h2 {
       font-size: 32px;
-
       margin: 5px 0;
     }
-
 
     .hero p {
       color: #ccc;
-
       margin: 5px 0;
     }
 
-
-    /* =========================
-       STATUS
-    ========================= */
+    /* STATUS */
 
     .status {
       background: #242424;
-
       padding: 15px;
-
       border-radius: 10px;
-
       margin: 10px 0;
-
       color: #eee;
     }
 
-
-    /* =========================
-       TASKS
-    ========================= */
+    /* TASKS */
 
     .section-title {
       margin-top: 35px;
-
       font-size: 27px;
     }
 
-
     .task-card {
       background: #1b1b1b;
-
       border: 1px solid #333;
-
       border-radius: 14px;
-
       padding: 20px;
-
       margin: 15px 0;
     }
 
-
     .task-card h3 {
       margin-top: 0;
-
       font-size: 22px;
     }
 
-
     .task-card p {
       color: #ddd;
-
       line-height: 1.5;
     }
 
-
     .reward {
       color: #ffd43b;
-
       font-weight: bold;
     }
-
 
     .start-task {
       background: #2563eb;
-
       color: white;
-
       font-weight: bold;
     }
-
 
     .submit-task {
       background: #16a34a;
-
       color: white;
-
       font-weight: bold;
     }
 
-
     .task-details {
       margin-top: 18px;
-
       padding-top: 15px;
-
       border-top: 1px solid #333;
     }
 
-
     .task-details textarea {
       width: 100%;
-
       min-height: 100px;
-
       resize: vertical;
-
       padding: 12px;
-
       border-radius: 8px;
-
       border: 1px solid #555;
-
       background: #111;
-
       color: white;
-
       margin: 10px 0;
     }
 
-
     .task-link {
       display: inline-block;
-
       background: #9333ea;
-
       color: white;
-
       padding: 10px 14px;
-
       border-radius: 8px;
-
       text-decoration: none;
-
       margin: 8px 0;
     }
-
 
     .hidden {
       display: none !important;
     }
 
-
-    /* =========================
-       HISTORY
-    ========================= */
+    /* HISTORY */
 
     .history-item {
       background: #1b1b1b;
-
       border: 1px solid #333;
-
       border-radius: 10px;
-
       padding: 14px;
-
       margin: 10px 0;
     }
 
-
-    /* =========================
-       ADS
-    ========================= */
+    /* ADS */
 
     .ad-box {
       width: 100%;
-
       display: flex;
-
       justify-content: center;
-
       align-items: center;
-
       margin: 20px auto;
-
       overflow: hidden;
     }
 
-
-    /* =========================
-       FOOTER
-    ========================= */
+    /* FOOTER */
 
     footer {
       text-align: center;
-
       padding: 25px;
-
       color: #888;
-
       border-top: 1px solid #222;
-
       margin-top: 30px;
     }
 
-
-    /* =========================
-       MOBILE
-    ========================= */
+    /* MOBILE */
 
     @media (max-width: 650px) {
 
@@ -384,91 +280,68 @@
         font-size: 27px;
       }
 
-
       .user-bar {
         align-items: center;
-
         padding: 12px;
       }
-
 
       .user-left {
         min-width: 0;
       }
 
-
       .user-right {
         flex-shrink: 0;
-
         justify-content: flex-end;
       }
-
 
       .user-right button,
       .user-right a {
         text-align: center;
       }
 
-
       .balance {
         width: 100%;
-
         text-align: right;
-
         margin-bottom: 3px;
       }
-
 
       .hero h2 {
         font-size: 27px;
       }
-
     }
-
 
     @media (max-width: 430px) {
 
       .user-bar {
         flex-direction: row;
-
         align-items: flex-start;
       }
-
 
       .user-left {
         padding-top: 8px;
       }
 
-
       .user-right {
         flex-direction: column;
-
         align-items: stretch;
       }
-
 
       .balance {
         text-align: center;
       }
 
-
       .user-right button,
       .user-right a {
         width: 100%;
       }
-
     }
 
   </style>
 </head>
 
-
 <body>
 
-
-<!-- =========================
-     HEADER
-========================= -->
+<!-- HEADER -->
 
 <header>
 
@@ -483,15 +356,11 @@
 </header>
 
 
-
-<!-- =========================
-     USER BAR
-========================= -->
+<!-- USER BAR -->
 
 <div class="user-bar">
 
-
-  <!-- LEFT: USERNAME -->
+  <!-- USERNAME ONLY -->
 
   <div class="user-left">
 
@@ -509,11 +378,9 @@
   </div>
 
 
-
-  <!-- RIGHT: BALANCE + BUTTONS -->
+  <!-- BALANCE + BUTTONS -->
 
   <div class="user-right">
-
 
     <span class="balance">
 
@@ -567,10 +434,7 @@
 </div>
 
 
-
-<!-- =========================
-     TOP AD
-========================= -->
+<!-- TOP AD -->
 
 <div class="ad-box">
 
@@ -589,13 +453,9 @@
 </div>
 
 
-
-<!-- =========================
-     MAIN
-========================= -->
+<!-- MAIN -->
 
 <div class="container">
-
 
   <div class="hero">
 
@@ -610,15 +470,11 @@
   </div>
 
 
-
-  <!-- =========================
-       TASK LIST
-  ========================= -->
+  <!-- TASK LIST -->
 
   <h2 class="section-title">
     📋 Tasks
   </h2>
-
 
   <div id="taskList">
 
@@ -629,15 +485,11 @@
   </div>
 
 
-
-  <!-- =========================
-       TASK HISTORY
-  ========================= -->
+  <!-- TASK HISTORY -->
 
   <h2 class="section-title">
     📌 My Task History
   </h2>
-
 
   <div id="submissionList">
 
@@ -647,14 +499,10 @@
 
   </div>
 
-
 </div>
 
 
-
-<!-- =========================
-     BOTTOM AD
-========================= -->
+<!-- BOTTOM AD -->
 
 <div class="ad-box">
 
@@ -673,10 +521,7 @@
 </div>
 
 
-
-<!-- =========================
-     FOOTER
-========================= -->
+<!-- FOOTER -->
 
 <footer>
 
@@ -685,14 +530,8 @@
 </footer>
 
 
-
-<!-- =========================
-     JAVASCRIPT
-========================= -->
-
 <script src="tasks.js"></script>
 
-
 </body>
-
 </html>
+```
