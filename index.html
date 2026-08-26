@@ -1,10 +1,166 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>LSR 💠 Downloader</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    /* =========================
+       ACCOUNT BOX
+       ========================= */
+
+    .account-box {
+      margin: 18px auto;
+      padding: 16px 20px;
+      max-width: 850px;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .account-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .account-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #292929;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .account-info {
+      min-width: 0;
+    }
+
+    .account-name {
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-email {
+      color: #aaa;
+      font-size: 13px;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    .account-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .balance-label {
+      color: #aaa;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .balance-value {
+      color: #ffd21f;
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .account-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 9px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .account-btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-size: 14px;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .login-account {
+      background: #2864e6;
+      color: white;
+    }
+
+    .signup-account {
+      background: #16a34a;
+      color: white;
+    }
+
+    .withdraw-account {
+      background: #f5a400;
+      color: #111;
+    }
+
+    .logout-account {
+      background: #dc2626;
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+
+      .account-box {
+        margin: 12px;
+        padding: 13px;
+      }
+
+      .account-icon {
+        width: 46px;
+        height: 46px;
+        font-size: 24px;
+      }
+
+      .account-name {
+        font-size: 17px;
+      }
+
+      .account-email {
+        font-size: 12px;
+        max-width: 150px;
+      }
+
+      .balance-value {
+        font-size: 17px;
+      }
+
+      .account-btn {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
 <header>
@@ -12,7 +168,110 @@
   <p>Fast • Simple • Smart Earning Platform</p>
 </header>
 
+
+<!-- ===== ACCOUNT BOX ===== -->
+
+<div class="account-box">
+
+  <!-- LEFT -->
+  <div class="account-left">
+
+    <div class="account-icon">
+      👤
+    </div>
+
+    <div class="account-info">
+
+      <div
+        class="account-name"
+        id="accountName"
+      >
+        Guest
+      </div>
+
+      <div
+        class="account-email"
+        id="accountEmail"
+        style="display:none;"
+      ></div>
+
+      <!-- Guest buttons -->
+      <div
+        class="account-buttons"
+        id="guestButtons"
+        style="justify-content:flex-start;"
+      >
+
+        <a
+          href="login.html"
+          class="account-btn login-account"
+        >
+          Login
+        </a>
+
+        <a
+          href="signup.html"
+          class="account-btn signup-account"
+        >
+          Sign Up
+        </a>
+
+        <a
+          href="withdraw.html"
+          class="account-btn withdraw-account"
+        >
+          💸 Withdraw
+        </a>
+
+      </div>
+
+
+      <!-- Logged-in buttons -->
+      <div
+        class="account-buttons"
+        id="userButtons"
+        style="display:none; justify-content:flex-start;"
+      >
+
+        <button
+          class="account-btn logout-account"
+          onclick="logoutUser()"
+        >
+          Logout
+        </button>
+
+        <a
+          href="withdraw.html"
+          class="account-btn withdraw-account"
+        >
+          💸 Withdraw
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- RIGHT -->
+  <div class="account-right">
+
+    <div class="balance-label">
+      Balance
+    </div>
+
+    <div class="balance-value">
+      <span id="accountBalance">0</span> Coins
+    </div>
+
+  </div>
+
+</div>
+
+
 <!-- ===== TOP AD ===== -->
+
 <div class="ad-box">
 <script>
 atOptions = {
@@ -23,21 +282,55 @@ atOptions = {
   'params' : {}
 };
 </script>
+
 <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
 </div>
 
+
 <!-- ===== MAIN MENU ===== -->
+
 <div class="menu">
-  <a href="downloader.html" class="btn">🎥 Downloader</a>
-  <a href="browser.html" class="btn">🌐 Browser</a>
-  <a href="blog.html" class="btn">📝 Blog</a>
-  <a href="news.html" class="btn">📰 News</a>
-  <a href="clickearn.html" class="btn">💰 Click & Earn</a>
-  <a href="tasks.html" class="btn">🪙 Micro Tasks</a>
-  <a href="https://aviso.bz/?r=bulbulrbya" target="_blank"><img src="https://aviso.bz/statica/pictures/A-468.gif" style="width:468px;heigh:60px" alt="aviso | рекламный сервис"></a>
+
+  <a href="downloader.html" class="btn">
+    🎥 Downloader
+  </a>
+
+  <a href="browser.html" class="btn">
+    🌐 Browser
+  </a>
+
+  <a href="blog.html" class="btn">
+    📝 Blog
+  </a>
+
+  <a href="news.html" class="btn">
+    📰 News
+  </a>
+
+  <a href="clickearn.html" class="btn">
+    💰 Click & Earn
+  </a>
+
+  <a href="tasks.html" class="btn">
+    🪙 Micro Tasks
+  </a>
+
+  <a
+    href="https://aviso.bz/?r=bulbulrbya"
+    target="_blank"
+  >
+    <img
+      src="https://aviso.bz/statica/pictures/A-468.gif"
+      style="width:468px;heigh:60px"
+      alt="aviso | рекламный сервис"
+    >
+  </a>
+
 </div>
 
+
 <!-- ===== BOTTOM ADS (all remaining banners) ===== -->
+
 <div class="ad-box">
 <script>
 atOptions = {
@@ -48,8 +341,10 @@ atOptions = {
   'params' : {}
 };
 </script>
+
 <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
 </div>
+
 
 <div class="ad-box">
 <script>
@@ -61,8 +356,10 @@ atOptions = {
   'params' : {}
 };
 </script>
+
 <script src="https://www.highperformanceformat.com/d3ba86d4abd7cc73ecbfe82be6839a80/invoke.js"></script>
 </div>
+
 
 <div class="ad-box">
 <script>
@@ -74,13 +371,326 @@ atOptions = {
   'params' : {}
 };
 </script>
+
 <script src="https://www.highperformanceformat.com/a8ef1cab5b59d4b91a97aab897d1fec1/invoke.js"></script>
 </div>
+
 
 <footer>
   © 2026 LSR Earning Point
 </footer>
 
+
 <script src="main.js"></script>
+
+
+<!-- ===== ACCOUNT SYSTEM ===== -->
+
+<script>
+
+let accountSupabase = null;
+
+
+/* =========================
+   START
+   ========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async function () {
+
+    try {
+
+      if (
+        typeof supabase === "undefined"
+      ) {
+        console.error(
+          "Supabase library not loaded."
+        );
+        return;
+      }
+
+      accountSupabase =
+        supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY
+        );
+
+      await updateAccountUI();
+
+
+      /* Detect login/logout automatically */
+
+      accountSupabase.auth.onAuthStateChange(
+        function () {
+
+          setTimeout(
+            updateAccountUI,
+            0
+          );
+
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Account system error:",
+        error
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================
+   UPDATE ACCOUNT
+   ========================= */
+
+async function updateAccountUI() {
+
+  if (!accountSupabase) return;
+
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await accountSupabase.auth.getUser();
+
+
+  const nameElement =
+    document.getElementById(
+      "accountName"
+    );
+
+  const emailElement =
+    document.getElementById(
+      "accountEmail"
+    );
+
+  const balanceElement =
+    document.getElementById(
+      "accountBalance"
+    );
+
+  const guestButtons =
+    document.getElementById(
+      "guestButtons"
+    );
+
+  const userButtons =
+    document.getElementById(
+      "userButtons"
+    );
+
+
+  /* =========================
+     GUEST
+     ========================= */
+
+  if (!user) {
+
+    nameElement.textContent =
+      "Guest";
+
+    emailElement.textContent =
+      "";
+
+    emailElement.style.display =
+      "none";
+
+    balanceElement.textContent =
+      "0";
+
+    guestButtons.style.display =
+      "flex";
+
+    userButtons.style.display =
+      "none";
+
+    return;
+  }
+
+
+  /* =========================
+     USERNAME
+     ========================= */
+
+  let username =
+    user.user_metadata?.username ||
+    user.user_metadata?.full_name ||
+    "";
+
+
+  /*
+    Get username from profiles
+  */
+
+  try {
+
+    const {
+      data: profile,
+      error
+    } =
+      await accountSupabase
+        .from("profiles")
+        .select(
+          "username, full_name"
+        )
+        .eq(
+          "id",
+          user.id
+        )
+        .maybeSingle();
+
+
+    if (!error && profile) {
+
+      username =
+        profile.username ||
+        profile.full_name ||
+        username;
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Profile loading error:",
+      error
+    );
+
+  }
+
+
+  /*
+    Fallback to email username
+  */
+
+  if (!username) {
+
+    username =
+      user.email
+        ? user.email.split("@")[0]
+        : "User";
+
+  }
+
+
+  nameElement.textContent =
+    username;
+
+
+  /* =========================
+     EMAIL
+     ========================= */
+
+  emailElement.textContent =
+    user.email || "";
+
+  emailElement.style.display =
+    user.email
+      ? "block"
+      : "none";
+
+
+  /* =========================
+     BALANCE
+     ========================= */
+
+  let balance = 0;
+
+
+  try {
+
+    const {
+      data: wallet,
+      error
+    } =
+      await accountSupabase
+        .from("wallets")
+        .select("balance")
+        .eq(
+          "user_id",
+          user.id
+        )
+        .maybeSingle();
+
+
+    if (!error && wallet) {
+
+      balance =
+        Number(
+          wallet.balance || 0
+        );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Wallet loading error:",
+      error
+    );
+
+  }
+
+
+  balanceElement.textContent =
+    balance;
+
+
+  /* =========================
+     BUTTONS
+     ========================= */
+
+  guestButtons.style.display =
+    "none";
+
+  userButtons.style.display =
+    "flex";
+
+}
+
+
+/* =========================
+   LOGOUT
+   ========================= */
+
+async function logoutUser() {
+
+  if (!accountSupabase) return;
+
+
+  const {
+    error
+  } =
+    await accountSupabase.auth.signOut();
+
+
+  if (error) {
+
+    alert(
+      "Logout failed: " +
+      error.message
+    );
+
+    console.error(error);
+
+    return;
+  }
+
+
+  await updateAccountUI();
+
+}
+
+</script>
+
 </body>
 </html>
+```
