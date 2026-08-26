@@ -1,217 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LSR Micro Tasks</title>
-  <link rel="stylesheet" href="style.css">
+
+  <title>Micro Tasks - LSR</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 
   <style>
-    .task-page {
-      width: 92%;
-      max-width: 900px;
-      margin: 25px auto;
+    * {
+      box-sizing: border-box;
     }
 
-    .account-box,
-    .task-card,
-    .withdraw-box,
-    .history-box {
-      background: #1b1b1b;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.25);
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* HEADER */
+
+    header {
+      padding: 25px 15px;
+      text-align: center;
+      background: #191919;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #ccc;
+    }
+
+    /* USER BAR */
+
+    .user-bar {
+      max-width: 1000px;
+      margin: 18px auto;
+      padding: 14px 18px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+
+      background: #191919;
+      border-radius: 12px;
+      border: 1px solid #333;
+    }
+
+    .user-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .username {
+      font-weight: bold;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .balance {
-      text-align: center;
-      font-size: 28px;
+      color: #ffd43b;
       font-weight: bold;
-      margin: 10px 0;
+      white-space: nowrap;
     }
 
-    .coin {
-      color: #ffd54a;
+    /* BUTTONS */
+
+    button,
+    .nav-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+    }
+
+    .login-btn {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .signup-btn {
+      background: #16a34a;
+      color: #fff;
+    }
+
+    .logout-btn {
+      background: #555;
+      color: #fff;
+    }
+
+    .withdraw-btn {
+      background: #f59e0b;
+      color: #111;
+      font-weight: bold;
+    }
+
+    /* MAIN */
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 10px 18px 40px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .hero h2 {
+      font-size: 32px;
+      margin: 5px 0;
+    }
+
+    .hero p {
+      color: #ccc;
+      margin: 5px 0;
+    }
+
+    /* STATUS */
+
+    .status {
+      background: #242424;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      color: #eee;
+    }
+
+    /* TASKS */
+
+    .section-title {
+      margin-top: 35px;
+      font-size: 27px;
+    }
+
+    .task-card {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 20px;
+      margin: 15px 0;
     }
 
     .task-card h3 {
       margin-top: 0;
+      font-size: 22px;
+    }
+
+    .task-card p {
+      color: #ddd;
+      line-height: 1.5;
     }
 
     .reward {
-      color: #ffd54a;
+      color: #ffd43b;
       font-weight: bold;
     }
 
-    .task-card button,
-    .withdraw-box button {
-      width: 100%;
-      padding: 13px;
-      border: 0;
-      border-radius: 10px;
-      margin-top: 10px;
-      background: linear-gradient(135deg,#ff512f,#dd2476);
+    .start-task {
+      background: #2563eb;
       color: white;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    .task-card input,
-    .task-card textarea,
-    .withdraw-box input,
-    .withdraw-box select {
-      box-sizing: border-box;
-      margin-top: 10px;
+    .submit-task {
+      background: #16a34a;
+      color: white;
+      font-weight: bold;
+    }
+
+    .task-details {
+      margin-top: 18px;
+      padding-top: 15px;
+      border-top: 1px solid #333;
+    }
+
+    .task-details textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background: #111;
+      color: white;
+      margin: 10px 0;
+    }
+
+    .task-link {
+      display: inline-block;
+      background: #9333ea;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 8px 0;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
-    .status {
-      padding: 10px;
-      border-radius: 8px;
-      background: #292929;
-      margin-top: 10px;
+    /* HISTORY */
+
+    .history-item {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 14px;
+      margin: 10px 0;
     }
 
-    .back-btn {
-      display: block;
+    /* AUTH MESSAGE */
+
+    #userStatus {
       text-align: center;
-      margin: 20px auto;
-      color: white;
-      text-decoration: none;
+      color: #bbb;
+      margin: 15px 0;
     }
 
-    .section-title {
+    /* ADS */
+
+    .ad-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+
+    /* FOOTER */
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #888;
+      border-top: 1px solid #222;
       margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+
+      header h1 {
+        font-size: 27px;
+      }
+
+      .user-bar {
+        align-items: flex-start;
+      }
+
+      .user-right {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+
+      .user-right button,
+      .user-right a {
+        width: 100%;
+        text-align: center;
+      }
+
+      .hero h2 {
+        font-size: 27px;
+      }
+
     }
   </style>
 </head>
 
+
 <body>
 
+
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
+
   <h1>🪙 Micro Tasks</h1>
-  <p>Complete tasks and earn coins</p>
+
+  <p>
+    Complete tasks and earn coins
+  </p>
+
 </header>
 
-<div class="task-page">
 
-  <!-- ACCOUNT -->
-  <div class="account-box">
-    <h2>💰 Your Balance</h2>
+<!-- =========================
+     USER BAR
+========================= -->
 
-    <div class="balance">
-      <span id="balance">0</span>
-      <span class="coin">Coins</span>
-    </div>
+<div class="user-bar">
 
-    <p id="userStatus">Checking account...</p>
-  </div>
+  <!-- LEFT: USERNAME -->
 
+  <div class="user-left">
 
-  <!-- AVAILABLE TASKS -->
-  <h2 class="section-title">📋 Available Tasks</h2>
+    <span>👤</span>
 
-  <div id="taskList">
-    <div class="status">Loading tasks...</div>
-  </div>
-
-
-  <!-- MY SUBMISSIONS -->
-  <h2 class="section-title">📌 My Task History</h2>
-
-  <div id="submissionList">
-    <div class="status">Loading history...</div>
-  </div>
-
-
-  <!-- WITHDRAW -->
-  <h2 class="section-title">💸 Withdraw</h2>
-
-  <div class="withdraw-box">
-
-    <p>Available Balance:</p>
-
-    <strong>
-      <span id="withdrawBalance">0</span> Coins
-    </strong>
-
-    <select id="withdrawMethod">
-      <option value="">Select payment method</option>
-      <option value="bKash">bKash</option>
-      <option value="Nagad">Nagad</option>
-      <option value="Rocket">Rocket</option>
-      <option value="PayPal">PayPal</option>
-    </select>
-
-    <input
-      type="text"
-      id="accountDetails"
-      placeholder="Payment account number/email"
+    <span
+      id="username"
+      class="username"
     >
+      Guest
+    </span>
 
-    <input
-      type="number"
-      id="withdrawAmount"
-      placeholder="Amount in coins"
-      min="1"
+  </div>
+
+
+  <!-- RIGHT: BALANCE + BUTTONS -->
+
+  <div class="user-right">
+
+    <span class="balance">
+      🪙 <span id="balance">0</span> Coins
+    </span>
+
+
+    <a
+      href="login.html"
+      id="loginButton"
+      class="nav-btn login-btn"
     >
+      Login
+    </a>
 
-    <button onclick="requestWithdrawal()">
-      💸 Request Withdrawal
+
+    <a
+      href="signup.html"
+      id="signupButton"
+      class="nav-btn signup-btn"
+    >
+      Sign Up
+    </a>
+
+
+    <button
+      id="logoutButton"
+      class="logout-btn hidden"
+      onclick="logoutUser()"
+    >
+      Logout
     </button>
 
-    <div id="withdrawMessage"></div>
 
-  </div>
+    <a
+      href="withdraw.html"
+      class="nav-btn withdraw-btn"
+    >
+      💸 Withdraw
+    </a>
 
-
-  <!-- WITHDRAWAL HISTORY -->
-  <h2 class="section-title">📜 Withdrawal History</h2>
-
-  <div id="withdrawalList">
-    <div class="status">Loading...</div>
   </div>
 
 </div>
 
 
-<a href="index.html" class="back-btn">
-  ← Back to Home
-</a>
-
-
 <!-- =========================
-     ADSTERRA BOTTOM BANNER
-     ========================= -->
+     TOP AD
+========================= -->
 
 <div class="ad-box">
 
-<script>
-atOptions = {
-  'key' : '3f673e5d02626eb857acc774c36f56a6',
-  'format' : 'iframe',
-  'height' : 60,
-  'width' : 468,
-  'params' : {}
-};
-</script>
+  <script>
+    atOptions = {
+      'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+      'format': 'iframe',
+      'height': 50,
+      'width': 320,
+      'params': {}
+    };
+  </script>
 
-<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+  <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+
+</div>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+
+  <div class="hero">
+
+    <h2>📋 Available Tasks</h2>
+
+    <p>
+      Browse available tasks and earn coins.
+    </p>
+
+  </div>
+
+
+  <div id="userStatus">
+    Checking account...
+  </div>
+
+
+  <!-- =========================
+       TASK LIST
+  ========================= -->
+
+  <h2 class="section-title">
+    📋 Tasks
+  </h2>
+
+  <div id="taskList">
+
+    <div class="status">
+      Loading tasks...
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       TASK HISTORY
+  ========================= -->
+
+  <h2 class="section-title">
+    📌 My Task History
+  </h2>
+
+  <div id="submissionList">
+
+    <div class="status">
+      Login to see your task history.
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<!-- =========================
+     BOTTOM AD
+========================= -->
+
+<div class="ad-box">
+
+  <script>
+    atOptions = {
+      'key': '3f673e5d02626eb857acc774c36f56a6',
+      'format': 'iframe',
+      'height': 60,
+      'width': 468,
+      'params': {}
+    };
+  </script>
+
+  <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
 
 </div>
 
 
 <footer>
+
   © 2026 LSR Earning Point
+
 </footer>
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <script src="tasks.js"></script>
 
 </body>
