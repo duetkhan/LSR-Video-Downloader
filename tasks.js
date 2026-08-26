@@ -1,4 +1,3 @@
-
 let supabaseClient = null;
 let currentUser = null;
 
