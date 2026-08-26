@@ -22,11 +22,55 @@ document.addEventListener(
       }
 
 
+      if (
+        typeof SUPABASE_URL === "undefined" ||
+        typeof SUPABASE_PUBLISHABLE_KEY === "undefined"
+      ) {
+
+        showUserStatus(
+          "Supabase configuration is missing."
+        );
+
+        return;
+      }
+
+
       supabaseClient =
         supabase.createClient(
           SUPABASE_URL,
           SUPABASE_PUBLISHABLE_KEY
         );
+
+
+      /*
+        Listen for Supabase authentication changes.
+        This keeps the UI synchronized with login/logout.
+      */
+
+      supabaseClient.auth.onAuthStateChange(
+        async (event, session) => {
+
+          console.log(
+            "Auth event:",
+            event
+          );
+
+
+          if (
+            event === "SIGNED_OUT" ||
+            !session
+          ) {
+
+            currentUser = null;
+
+            updateAuthButtons(false);
+
+            resetGuestUI();
+
+          }
+
+        }
+      );
 
 
       await checkUser();
@@ -39,99 +83,204 @@ document.addEventListener(
         "Unable to connect to the task system."
       );
     }
+
   }
 );
 
 
 /* =========================
-   AUTH
+   AUTH CHECK
 ========================= */
 
 async function checkUser() {
 
-  const {
-    data: {
-      user
-    },
-    error
-  } =
-    await supabaseClient.auth.getUser();
-
-
-  if (error) {
-
-    console.error(error);
-
-  }
-
-
-  if (!user) {
-
-    currentUser = null;
-
-
-    showUserStatus(
-      `You are not logged in.
-       <a href="index.html">
-       Go to Home
-       </a>`
-    );
-
-
-    const taskList =
-      document.getElementById(
-        "taskList"
-      );
-
-    if (taskList) {
-
-      taskList.innerHTML =
-        `<div class="status">
-          Please login first to access Micro Tasks.
-        </div>`;
-    }
-
-
-    const submissionList =
-      document.getElementById(
-        "submissionList"
-      );
-
-    if (submissionList) {
-
-      submissionList.innerHTML =
-        `<div class="status">
-          Login required.
-        </div>`;
-    }
-
-
-    updateAuthButtons(false);
-
-
+  if (!supabaseClient) {
     return;
   }
 
 
-  currentUser = user;
+  try {
+
+    const {
+      data: {
+        user
+      },
+      error
+    } =
+      await supabaseClient.auth.getUser();
 
 
-  showUserStatus(
-    `Logged in as:
-     ${escapeHtml(
-       user.email || "User"
-     )}`
-  );
+    if (error) {
+
+      console.error(
+        "Auth check error:",
+        error
+      );
+
+      currentUser = null;
+
+      updateAuthButtons(false);
+
+      resetGuestUI();
+
+      return;
+    }
 
 
-  await loadProfile();
-  await loadWallet();
-  await loadTasks();
-  await loadSubmissions();
-  await loadWithdrawals();
+    /*
+      USER NOT LOGGED IN
+    */
+
+    if (!user) {
+
+      currentUser = null;
+
+      updateAuthButtons(false);
+
+      resetGuestUI();
 
 
-  updateAuthButtons(true);
+      const taskList =
+        document.getElementById(
+          "taskList"
+        );
+
+
+      if (taskList) {
+
+        taskList.innerHTML =
+          `<div class="status">
+            Please login first to access Micro Tasks.
+          </div>`;
+
+      }
+
+
+      const submissionList =
+        document.getElementById(
+          "submissionList"
+        );
+
+
+      if (submissionList) {
+
+        submissionList.innerHTML =
+          `<div class="status">
+            Login required.
+          </div>`;
+
+      }
+
+
+      return;
+    }
+
+
+    /*
+      USER IS LOGGED IN
+    */
+
+    currentUser = user;
+
+
+    showUserStatus(
+      `Logged in as:
+       ${escapeHtml(
+         user.email || "User"
+       )}`
+    );
+
+
+    /*
+      Load user information
+    */
+
+    await loadProfile();
+
+    await loadWallet();
+
+    await loadTasks();
+
+    await loadSubmissions();
+
+    await loadWithdrawals();
+
+
+    /*
+      Hide Login + Sign Up
+      Show Logout
+    */
+
+    updateAuthButtons(true);
+
+
+  } catch (error) {
+
+    console.error(
+      "checkUser error:",
+      error
+    );
+
+    currentUser = null;
+
+    updateAuthButtons(false);
+
+    resetGuestUI();
+  }
+
+}
+
+
+/* =========================
+   RESET GUEST UI
+========================= */
+
+function resetGuestUI() {
+
+  const usernameElement =
+    document.getElementById(
+      "username"
+    );
+
+
+  if (usernameElement) {
+
+    usernameElement.textContent =
+      "Guest";
+
+  }
+
+
+  const balanceElement =
+    document.getElementById(
+      "balance"
+    );
+
+
+  if (balanceElement) {
+
+    balanceElement.textContent =
+      "0";
+
+  }
+
+
+  const withdrawBalance =
+    document.getElementById(
+      "withdrawBalance"
+    );
+
+
+  if (withdrawBalance) {
+
+    withdrawBalance.textContent =
+      "0";
+
+  }
+
+
+  updateAuthButtons(false);
+
 }
 
 
@@ -162,7 +311,29 @@ async function loadProfile() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Profile error:",
+      error
+    );
+
+    /*
+      Fallback username
+    */
+
+    const usernameElement =
+      document.getElementById(
+        "username"
+      );
+
+
+    if (usernameElement) {
+
+      usernameElement.textContent =
+        currentUser.email
+          ? currentUser.email.split("@")[0]
+          : "User";
+
+    }
 
     return;
   }
@@ -193,7 +364,9 @@ async function loadProfile() {
       currentUser.email
         ? currentUser.email.split("@")[0]
         : "User";
+
   }
+
 }
 
 
@@ -210,10 +383,12 @@ function updateAuthButtons(
       "loginButton"
     );
 
+
   const signupButton =
     document.getElementById(
       "signupButton"
     );
+
 
   const logoutButton =
     document.getElementById(
@@ -223,11 +398,16 @@ function updateAuthButtons(
 
   if (loggedIn) {
 
+    /*
+      LOGGED IN
+    */
+
     if (loginButton) {
 
       loginButton.classList.add(
         "hidden"
       );
+
     }
 
 
@@ -236,6 +416,7 @@ function updateAuthButtons(
       signupButton.classList.add(
         "hidden"
       );
+
     }
 
 
@@ -244,15 +425,28 @@ function updateAuthButtons(
       logoutButton.classList.remove(
         "hidden"
       );
+
+      logoutButton.disabled =
+        false;
+
+      logoutButton.textContent =
+        "Logout";
+
     }
 
+
   } else {
+
+    /*
+      LOGGED OUT
+    */
 
     if (loginButton) {
 
       loginButton.classList.remove(
         "hidden"
       );
+
     }
 
 
@@ -261,6 +455,7 @@ function updateAuthButtons(
       signupButton.classList.remove(
         "hidden"
       );
+
     }
 
 
@@ -269,8 +464,17 @@ function updateAuthButtons(
       logoutButton.classList.add(
         "hidden"
       );
+
+      logoutButton.disabled =
+        false;
+
+      logoutButton.textContent =
+        "Logout";
+
     }
+
   }
+
 }
 
 
@@ -280,13 +484,9 @@ function updateAuthButtons(
 
 async function logoutUser() {
 
-  if (!supabaseClient) {
-
-    window.location.href =
-      "login.html";
-
-    return;
-  }
+  console.log(
+    "Logout button clicked"
+  );
 
 
   const logoutButton =
@@ -295,6 +495,10 @@ async function logoutUser() {
     );
 
 
+  /*
+    Prevent double-click
+  */
+
   if (logoutButton) {
 
     logoutButton.disabled =
@@ -302,51 +506,92 @@ async function logoutUser() {
 
     logoutButton.textContent =
       "Logging out...";
+
   }
 
 
   try {
 
-    const {
-      error
-    } =
-      await supabaseClient.auth.signOut();
+    /*
+      Make sure Supabase client exists
+    */
 
+    if (!supabaseClient) {
 
-    if (error) {
+      currentUser = null;
 
-      console.error(
-        "Logout error:",
-        error
+      resetGuestUI();
+
+      window.location.replace(
+        "login.html"
       );
-
-
-      alert(
-        "Logout failed:\n\n" +
-        error.message
-      );
-
-
-      if (logoutButton) {
-
-        logoutButton.disabled =
-          false;
-
-        logoutButton.textContent =
-          "Logout";
-      }
-
 
       return;
     }
 
 
-    /* Clear local state */
+    /*
+      Sign out from the current browser/session.
+
+      scope: "local" is intentional.
+      It removes the current local session.
+    */
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.signOut({
+        scope: "local"
+      });
+
+
+    if (error) {
+
+      console.error(
+        "Supabase logout error:",
+        error
+      );
+
+      /*
+        Try one more local sign-out.
+      */
+
+      try {
+
+        await supabaseClient.auth.signOut();
+
+      } catch (secondError) {
+
+        console.error(
+          "Second logout attempt failed:",
+          secondError
+        );
+
+      }
+
+    }
+
+
+    /*
+      Clear application state
+    */
 
     currentUser = null;
 
 
-    /* Go to login */
+    /*
+      Reset visible UI
+    */
+
+    resetGuestUI();
+
+
+    /*
+      IMPORTANT:
+      Replace instead of href so the user
+      does not stay on the authenticated
+      page through browser history.
+    */
 
     window.location.replace(
       "login.html"
@@ -361,21 +606,41 @@ async function logoutUser() {
     );
 
 
-    alert(
-      "Logout failed. Please try again."
+    /*
+      Even if an unexpected error happens,
+      clear our local application state.
+    */
+
+    currentUser = null;
+
+    resetGuestUI();
+
+
+    /*
+      Send user to login page.
+    */
+
+    window.location.replace(
+      "login.html"
     );
 
-
-    if (logoutButton) {
-
-      logoutButton.disabled =
-        false;
-
-      logoutButton.textContent =
-        "Logout";
-    }
   }
+
 }
+
+
+/*
+  VERY IMPORTANT
+
+  Your HTML uses:
+
+  onclick="logoutUser()"
+
+  Therefore expose the function globally.
+*/
+
+window.logoutUser =
+  logoutUser;
 
 
 /* =========================
@@ -410,7 +675,10 @@ async function loadWallet() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Wallet error:",
+      error
+    );
 
     return;
   }
@@ -432,6 +700,7 @@ async function loadWallet() {
 
     balanceElement.textContent =
       balance;
+
   }
 
 
@@ -445,7 +714,9 @@ async function loadWallet() {
 
     withdrawBalance.textContent =
       balance;
+
   }
+
 }
 
 
@@ -504,12 +775,17 @@ async function loadTasks() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Tasks error:",
+      error
+    );
+
 
     taskList.innerHTML =
       `<div class="status">
         Unable to load tasks.
       </div>`;
+
 
     return;
   }
@@ -524,6 +800,7 @@ async function loadTasks() {
       `<div class="status">
         No tasks available right now.
       </div>`;
+
 
     return;
   }
@@ -577,8 +854,8 @@ async function loadTasks() {
             ${remaining}
           </p>
 
-
           <button
+            class="start-task"
             onclick="openTask(${Number(task.id)})"
           >
             ▶ Start Task
@@ -649,6 +926,7 @@ async function loadTasks() {
       `;
 
     }).join("");
+
 }
 
 
@@ -656,7 +934,9 @@ async function loadTasks() {
    OPEN TASK
 ========================= */
 
-function openTask(taskId) {
+function openTask(
+  taskId
+) {
 
   const box =
     document.getElementById(
@@ -672,6 +952,7 @@ function openTask(taskId) {
   box.classList.toggle(
     "hidden"
   );
+
 }
 
 
@@ -719,8 +1000,8 @@ async function submitTask(
         `<div class="status">
           Please enter your proof.
         </div>`;
-    }
 
+    }
 
     return;
   }
@@ -732,6 +1013,7 @@ async function submitTask(
       `<div class="status">
         Submitting...
       </div>`;
+
   }
 
 
@@ -750,7 +1032,10 @@ async function submitTask(
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Submit task error:",
+      error
+    );
 
 
     if (resultElement) {
@@ -761,8 +1046,8 @@ async function submitTask(
             error.message
           )}
         </div>`;
-    }
 
+    }
 
     return;
   }
@@ -775,16 +1060,19 @@ async function submitTask(
         ✅ Submitted successfully.
         Your task is now pending review.
       </div>`;
+
   }
 
 
   if (proofElement) {
 
     proofElement.value = "";
+
   }
 
 
   await loadSubmissions();
+
 }
 
 
@@ -842,12 +1130,17 @@ async function loadSubmissions() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Submission error:",
+      error
+    );
+
 
     submissionList.innerHTML =
       `<div class="status">
         Unable to load task history.
       </div>`;
+
 
     return;
   }
@@ -862,6 +1155,7 @@ async function loadSubmissions() {
       `<div class="status">
         No task submissions yet.
       </div>`;
+
 
     return;
   }
@@ -879,7 +1173,9 @@ async function loadSubmissions() {
         <div class="history-item">
 
           <strong>
-            ${escapeHtml(title)}
+            ${escapeHtml(
+              title
+            )}
           </strong>
 
           <br><br>
@@ -924,6 +1220,7 @@ async function loadSubmissions() {
       `;
 
     }).join("");
+
 }
 
 
@@ -995,6 +1292,7 @@ async function requestWithdrawal() {
         `<div class="status">
           Select a payment method.
         </div>`;
+
     }
 
     return;
@@ -1009,6 +1307,7 @@ async function requestWithdrawal() {
         `<div class="status">
           Enter your payment account.
         </div>`;
+
     }
 
     return;
@@ -1026,6 +1325,7 @@ async function requestWithdrawal() {
         `<div class="status">
           Enter a valid withdrawal amount.
         </div>`;
+
     }
 
     return;
@@ -1038,6 +1338,7 @@ async function requestWithdrawal() {
       `<div class="status">
         Processing withdrawal...
       </div>`;
+
   }
 
 
@@ -1058,7 +1359,10 @@ async function requestWithdrawal() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Withdrawal error:",
+      error
+    );
 
 
     if (message) {
@@ -1069,8 +1373,8 @@ async function requestWithdrawal() {
             error.message
           )}
         </div>`;
-    }
 
+    }
 
     return;
   }
@@ -1083,23 +1387,28 @@ async function requestWithdrawal() {
         ✅ Withdrawal request
         submitted successfully.
       </div>`;
+
   }
 
 
   if (amountElement) {
 
     amountElement.value = "";
+
   }
 
 
   if (accountElement) {
 
     accountElement.value = "";
+
   }
 
 
   await loadWallet();
+
   await loadWithdrawals();
+
 }
 
 
@@ -1154,12 +1463,17 @@ async function loadWithdrawals() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Withdrawal history error:",
+      error
+    );
+
 
     list.innerHTML =
       `<div class="status">
         Unable to load withdrawals.
       </div>`;
+
 
     return;
   }
@@ -1174,6 +1488,7 @@ async function loadWithdrawals() {
       `<div class="status">
         No withdrawal requests yet.
       </div>`;
+
 
     return;
   }
@@ -1230,6 +1545,7 @@ async function loadWithdrawals() {
       `;
 
     }).join("");
+
 }
 
 
@@ -1251,7 +1567,9 @@ function showUserStatus(
 
     element.innerHTML =
       message;
+
   }
+
 }
 
 
@@ -1286,6 +1604,7 @@ function escapeHtml(
       /'/g,
       "&#039;"
     );
+
 }
 
 
@@ -1307,13 +1626,12 @@ function safeUrl(
 
 
     if (
-      url.protocol ===
-        "https:" ||
-      url.protocol ===
-        "http:"
+      url.protocol === "https:" ||
+      url.protocol === "http:"
     ) {
 
       return url.href;
+
     }
 
 
@@ -1322,7 +1640,9 @@ function safeUrl(
   } catch {
 
     return "#";
+
   }
+
 }
 
 
@@ -1350,9 +1670,27 @@ function formatDate(
   ) {
 
     return "";
+
   }
 
 
   return date.toLocaleString();
+
 }
-```
+
+
+/* =========================
+   GLOBAL FUNCTIONS
+========================= */
+
+window.openTask =
+  openTask;
+
+window.submitTask =
+  submitTask;
+
+window.requestWithdrawal =
+  requestWithdrawal;
+
+window.logoutUser =
+  logoutUser;
