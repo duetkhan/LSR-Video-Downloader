@@ -1,11 +1,11 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Micro Tasks</title>
+  <title>Micro Tasks - LSR</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
@@ -17,402 +17,682 @@
 
     body {
       margin: 0;
+      background: #0d0d0d;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
     }
 
-    .container {
-      max-width: 850px;
-      margin: auto;
-      padding: 15px;
-    }
-
-    h1,
-    h2 {
-      text-align: center;
+    a {
+      color: inherit;
     }
 
     /* =========================
-       USER BOX
-       ========================= */
+       HEADER
+    ========================= */
 
-    .user-box {
-      background: #fff;
-      border-radius: 15px;
-      padding: 16px;
-      margin-bottom: 15px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    header {
+      padding: 25px 15px;
+      text-align: center;
+      background: #191919;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #ccc;
+    }
+
+
+    /* =========================
+       USER BAR
+    ========================= */
+
+    .user-bar {
+      max-width: 1000px;
+      margin: 18px auto;
+      padding: 14px 18px;
 
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+
       gap: 15px;
+
+      background: #191919;
+      border-radius: 12px;
+      border: 1px solid #333;
     }
+
+
+    /* LEFT */
 
     .user-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
+
       min-width: 0;
-    }
-
-    .user-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #eee;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 27px;
-      flex-shrink: 0;
+      flex: 1;
     }
 
     .username {
-      font-size: 20px;
       font-weight: bold;
+      color: #fff;
 
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .user-email {
-      margin-top: 4px;
-      color: #777;
-      font-size: 13px;
 
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 300px;
-    }
+    /* RIGHT */
 
-    .balance-box {
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .balance-label {
-      color: #777;
-      font-size: 13px;
-    }
-
-    .balance-value {
-      color: #d99b00;
-      font-size: 20px;
-      font-weight: bold;
-      margin-top: 3px;
-    }
-
-    /* =========================
-       AUTH BUTTONS
-       ========================= */
-
-    .auth-buttons {
+    .user-right {
       display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
     }
 
-    .auth-buttons a,
-    .auth-buttons button {
-      flex: 1;
-      min-width: 100px;
+    .balance {
+      color: #ffd43b;
+      font-weight: bold;
+      white-space: nowrap;
+    }
 
-      padding: 12px;
-      border: 0;
-      border-radius: 9px;
 
-      text-align: center;
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    button,
+    .nav-btn {
+      border: none;
+      border-radius: 8px;
+
+      padding: 10px 14px;
+
+      cursor: pointer;
+
       text-decoration: none;
 
-      font-size: 15px;
-      cursor: pointer;
+      display: inline-block;
+
+      font-size: 14px;
     }
+
 
     .login-btn {
       background: #2563eb;
       color: #fff;
     }
 
+
     .signup-btn {
       background: #16a34a;
       color: #fff;
     }
 
+
+    .logout-btn {
+      background: #555;
+      color: #fff;
+    }
+
+
     .withdraw-btn {
       background: #f59e0b;
       color: #111;
+
+      font-weight: bold;
     }
 
-    .logout-btn {
-      background: #dc2626;
-      color: #fff;
-    }
 
     /* =========================
-       TASK CARD
-       ========================= */
+       MAIN
+    ========================= */
+
+    .container {
+      max-width: 1000px;
+
+      margin: auto;
+
+      padding: 10px 18px 40px;
+    }
+
+
+    .hero {
+      text-align: center;
+
+      padding: 20px 10px;
+    }
+
+
+    .hero h2 {
+      font-size: 32px;
+
+      margin: 5px 0;
+    }
+
+
+    .hero p {
+      color: #ccc;
+
+      margin: 5px 0;
+    }
+
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+      background: #242424;
+
+      padding: 15px;
+
+      border-radius: 10px;
+
+      margin: 10px 0;
+
+      color: #eee;
+    }
+
+
+    /* =========================
+       TASKS
+    ========================= */
+
+    .section-title {
+      margin-top: 35px;
+
+      font-size: 27px;
+    }
+
 
     .task-card {
-      background: #fff;
-      padding: 18px;
-      margin: 15px 0;
+      background: #1b1b1b;
+
+      border: 1px solid #333;
+
       border-radius: 14px;
-      box-shadow: 0 3px 15px rgba(0,0,0,.08);
+
+      padding: 20px;
+
+      margin: 15px 0;
     }
+
 
     .task-card h3 {
       margin-top: 0;
+
+      font-size: 22px;
     }
 
-    .reward,
-    .coin {
-      font-weight: bold;
-      color: #d99b00;
+
+    .task-card p {
+      color: #ddd;
+
+      line-height: 1.5;
     }
 
-    .task-card button {
-      padding: 11px 15px;
-      border: 0;
-      border-radius: 8px;
-      background: #222;
-      color: #fff;
-      cursor: pointer;
-      margin-top: 8px;
-    }
 
-    .task-card a {
-      display: inline-block;
-      margin: 8px 0;
-      color: #2563eb;
+    .reward {
+      color: #ffd43b;
+
       font-weight: bold;
     }
 
-    textarea {
+
+    .start-task {
+      background: #2563eb;
+
+      color: white;
+
+      font-weight: bold;
+    }
+
+
+    .submit-task {
+      background: #16a34a;
+
+      color: white;
+
+      font-weight: bold;
+    }
+
+
+    .task-details {
+      margin-top: 18px;
+
+      padding-top: 15px;
+
+      border-top: 1px solid #333;
+    }
+
+
+    .task-details textarea {
       width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+
+      min-height: 100px;
+
       resize: vertical;
-    }
 
-    .hidden {
-      display: none;
-    }
+      padding: 12px;
 
-    .status {
-      background: #fff;
-      padding: 13px;
-      border-radius: 10px;
+      border-radius: 8px;
+
+      border: 1px solid #555;
+
+      background: #111;
+
+      color: white;
+
       margin: 10px 0;
     }
 
-    .back {
-      display: block;
-      text-align: center;
-      margin: 25px 0;
+
+    .task-link {
+      display: inline-block;
+
+      background: #9333ea;
+
+      color: white;
+
+      padding: 10px 14px;
+
+      border-radius: 8px;
+
       text-decoration: none;
-      color: #2563eb;
+
+      margin: 8px 0;
     }
 
-    @media (max-width: 600px) {
 
-      .user-box {
-        padding: 13px;
+    .hidden {
+      display: none !important;
+    }
+
+
+    /* =========================
+       HISTORY
+    ========================= */
+
+    .history-item {
+      background: #1b1b1b;
+
+      border: 1px solid #333;
+
+      border-radius: 10px;
+
+      padding: 14px;
+
+      margin: 10px 0;
+    }
+
+
+    /* =========================
+       ADS
+    ========================= */
+
+    .ad-box {
+      width: 100%;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      margin: 20px auto;
+
+      overflow: hidden;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      text-align: center;
+
+      padding: 25px;
+
+      color: #888;
+
+      border-top: 1px solid #222;
+
+      margin-top: 30px;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 650px) {
+
+      header h1 {
+        font-size: 27px;
       }
 
-      .username {
-        font-size: 17px;
-        max-width: 160px;
+
+      .user-bar {
+        align-items: center;
+
+        padding: 12px;
       }
 
-      .user-email {
-        max-width: 160px;
-        font-size: 12px;
+
+      .user-left {
+        min-width: 0;
       }
 
-      .balance-value {
-        font-size: 17px;
+
+      .user-right {
+        flex-shrink: 0;
+
+        justify-content: flex-end;
       }
 
-      .auth-buttons {
+
+      .user-right button,
+      .user-right a {
+        text-align: center;
+      }
+
+
+      .balance {
+        width: 100%;
+
+        text-align: right;
+
+        margin-bottom: 3px;
+      }
+
+
+      .hero h2 {
+        font-size: 27px;
+      }
+
+    }
+
+
+    @media (max-width: 430px) {
+
+      .user-bar {
+        flex-direction: row;
+
+        align-items: flex-start;
+      }
+
+
+      .user-left {
+        padding-top: 8px;
+      }
+
+
+      .user-right {
         flex-direction: column;
+
+        align-items: stretch;
       }
+
+
+      .balance {
+        text-align: center;
+      }
+
+
+      .user-right button,
+      .user-right a {
+        width: 100%;
+      }
+
     }
+
   </style>
 </head>
 
+
 <body>
 
-<div class="container">
 
-  <h1>🪙 Micro Tasks</h1>
+<!-- =========================
+     HEADER
+========================= -->
 
+<header>
 
-  <!-- =========================
-       USER BOX
-       ========================= -->
+  <h1>
+    🪙 Micro Tasks
+  </h1>
 
-  <div class="user-box">
+  <p>
+    Complete tasks and earn coins
+  </p>
 
-    <div class="user-left">
-
-      <div class="user-icon">
-        👤
-      </div>
-
-      <div>
-
-        <div
-          id="displayUsername"
-          class="username"
-        >
-          Guest
-        </div>
-
-        <div
-          id="displayEmail"
-          class="user-email"
-          style="display:none;"
-        ></div>
-
-      </div>
-
-    </div>
+</header>
 
 
-    <div class="balance-box">
 
-      <div class="balance-label">
-        Balance
-      </div>
+<!-- =========================
+     USER BAR
+========================= -->
 
-      <div class="balance-value">
-        <span id="balance">0</span> Coins
-      </div>
+<div class="user-bar">
 
-    </div>
+
+  <!-- LEFT: USERNAME -->
+
+  <div class="user-left">
+
+    <span>
+      👤
+    </span>
+
+    <span
+      id="username"
+      class="username"
+    >
+      Guest
+    </span>
 
   </div>
 
 
-  <!-- =========================
-       GUEST BUTTONS
-       ========================= -->
 
-  <div
-    id="guestButtons"
-    class="auth-buttons"
-  >
+  <!-- RIGHT: BALANCE + BUTTONS -->
+
+  <div class="user-right">
+
+
+    <span class="balance">
+
+      🪙
+
+      <span id="balance">
+        0
+      </span>
+
+      Coins
+
+    </span>
+
 
     <a
       href="login.html"
-      class="login-btn"
+      id="loginButton"
+      class="nav-btn login-btn"
     >
       Login
     </a>
 
+
     <a
       href="signup.html"
-      class="signup-btn"
+      id="signupButton"
+      class="nav-btn signup-btn"
     >
       Sign Up
     </a>
 
-    <a
-      href="withdraw.html"
-      class="withdraw-btn"
-    >
-      💸 Withdraw
-    </a>
-
-  </div>
-
-
-  <!-- =========================
-       LOGGED-IN BUTTONS
-       ========================= -->
-
-  <div
-    id="userButtons"
-    class="auth-buttons"
-    style="display:none;"
-  >
 
     <button
-      type="button"
-      class="logout-btn"
+      id="logoutButton"
+      class="logout-btn hidden"
       onclick="logoutUser()"
     >
       Logout
     </button>
 
+
     <a
       href="withdraw.html"
-      class="withdraw-btn"
+      class="nav-btn withdraw-btn"
     >
       💸 Withdraw
     </a>
 
   </div>
 
-
-  <!-- =========================
-       STATUS
-       ========================= -->
-
-  <div id="userStatus"></div>
+</div>
 
 
-  <!-- =========================
-       TASKS
-       ========================= -->
 
-  <h2>
-    📋 Available Tasks
-  </h2>
+<!-- =========================
+     TOP AD
+========================= -->
 
-  <div id="taskList">
-    <div class="status">
-      Loading tasks...
-    </div>
-  </div>
+<div class="ad-box">
 
+  <script>
+    atOptions = {
+      'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+      'format': 'iframe',
+      'height': 50,
+      'width': 320,
+      'params': {}
+    };
+  </script>
 
-  <!-- =========================
-       SUBMISSIONS
-       ========================= -->
-
-  <h2>
-    📜 My Task History
-  </h2>
-
-  <div id="submissionList">
-    <div class="status">
-      Login to view your task history.
-    </div>
-  </div>
-
-
-  <a
-    href="index.html"
-    class="back"
-  >
-    ← Back to Home
-  </a>
+  <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
 
 </div>
 
 
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+
+  <div class="hero">
+
+    <h2>
+      📋 Available Tasks
+    </h2>
+
+    <p>
+      Browse available tasks and earn coins.
+    </p>
+
+  </div>
+
+
+
+  <!-- =========================
+       TASK LIST
+  ========================= -->
+
+  <h2 class="section-title">
+    📋 Tasks
+  </h2>
+
+
+  <div id="taskList">
+
+    <div class="status">
+      Loading tasks...
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================
+       TASK HISTORY
+  ========================= -->
+
+  <h2 class="section-title">
+    📌 My Task History
+  </h2>
+
+
+  <div id="submissionList">
+
+    <div class="status">
+      Login to see your task history.
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<!-- =========================
+     BOTTOM AD
+========================= -->
+
+<div class="ad-box">
+
+  <script>
+    atOptions = {
+      'key': '3f673e5d02626eb857acc774c36f56a6',
+      'format': 'iframe',
+      'height': 60,
+      'width': 468,
+      'params': {}
+    };
+  </script>
+
+  <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+
+</div>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+  © 2026 LSR Earning Point = developed by- (Bulbul Ahmed Riyan)
+
+</footer>
+
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
 <script src="tasks.js"></script>
 
+
 </body>
+
 </html>
-```
