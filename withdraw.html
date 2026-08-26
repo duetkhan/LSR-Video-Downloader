@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Withdraw - LSR</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      text-align: center;
+      padding: 25px 15px;
+      background: #191919;
+      border-bottom: 1px solid #333;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 22px;
+      margin: 18px 0;
+    }
+
+    .balance {
+      text-align: center;
+      font-size: 28px;
+      color: #ffd43b;
+      font-weight: bold;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background: #111;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    button,
+    .back-btn {
+      width: 100%;
+      padding: 13px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+
+    .submit-btn {
+      background: #16a34a;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .back-btn {
+      background: #333;
+      color: #fff;
+    }
+
+    .status {
+      background: #242424;
+      padding: 14px;
+      border-radius: 9px;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+
+    .history-item {
+      background: #242424;
+      border-radius: 9px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .coin {
+      color: #ffd43b;
+      font-weight: bold;
+    }
+
+    .ad-box {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+
+<body>
+
+<header>
+
+  <h1>💸 Withdraw</h1>
+
+  <p>
+    Request your coin withdrawal
+  </p>
+
+</header>
+
+
+<div class="container">
+
+
+  <!-- TOP AD -->
+
+  <div class="ad-box">
+
+    <script>
+      atOptions = {
+        'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+        'format': 'iframe',
+        'height': 50,
+        'width': 320,
+        'params': {}
+      };
+    </script>
+
+    <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+
+  </div>
+
+
+  <!-- BALANCE -->
+
+  <div class="card">
+
+    <h2>🪙 Available Balance</h2>
+
+    <div class="balance">
+
+      <span id="balance">
+        0
+      </span>
+
+      Coins
+
+    </div>
+
+  </div>
+
+
+  <!-- WITHDRAW FORM -->
+
+  <div
+    class="card"
+    id="withdrawCard"
+  >
+
+    <h2>💸 Request Withdrawal</h2>
+
+
+    <label for="withdrawAmount">
+      Amount (Coins)
+    </label>
+
+    <input
+      type="number"
+      id="withdrawAmount"
+      min="1"
+      step="1"
+      placeholder="Enter amount"
+    >
+
+
+    <label for="withdrawMethod">
+      Payment Method
+    </label>
+
+    <select id="withdrawMethod">
+
+      <option value="">
+        Select payment method
+      </option>
+
+      <option value="bKash">
+        bKash
+      </option>
+
+      <option value="Nagad">
+        Nagad
+      </option>
+
+      <option value="PayPal">
+        PayPal
+      </option>
+
+      <option value="Binance">
+        Binance
+      </option>
+
+    </select>
+
+
+    <label for="accountDetails">
+      Payment Account
+    </label>
+
+    <input
+      type="text"
+      id="accountDetails"
+      placeholder="Enter number / email / wallet"
+    >
+
+
+    <button
+      class="submit-btn"
+      onclick="requestWithdrawal()"
+    >
+      Submit Withdrawal
+    </button>
+
+
+    <div
+      id="withdrawMessage"
+    ></div>
+
+  </div>
+
+
+  <!-- LOGIN MESSAGE -->
+
+  <div
+    id="loginMessage"
+    class="status hidden"
+  >
+    Please login to request a withdrawal.
+  </div>
+
+
+  <!-- HISTORY -->
+
+  <div class="card">
+
+    <h2>📋 Withdrawal History</h2>
+
+    <div id="withdrawalList">
+
+      <div class="status">
+        Login to view withdrawal history.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <a
+    href="tasks.html"
+    class="back-btn"
+  >
+    ← Back to Micro Tasks
+  </a>
+
+
+  <!-- BOTTOM AD -->
+
+  <div class="ad-box">
+
+    <script>
+      atOptions = {
+        'key': '3f673e5d02626eb857acc774c36f56a6',
+        'format': 'iframe',
+        'height': 60,
+        'width': 468,
+        'params': {}
+      };
+    </script>
+
+    <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let supabaseClient = null;
+let currentUser = null;
+
+
+/* =========================
+   INIT
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    supabaseClient =
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (
+      session &&
+      session.user
+    ) {
+
+      currentUser =
+        session.user;
+
+      await loadWallet();
+      await loadWithdrawals();
+
+    } else {
+
+      showLoggedOut();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   LOGGED OUT
+========================= */
+
+function showLoggedOut() {
+
+  document
+    .getElementById("withdrawCard")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("loginMessage")
+    .classList.remove("hidden");
+
+}
+
+
+/* =========================
+   WALLET
+========================= */
+
+async function loadWallet() {
+
+  if (!currentUser) return;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("wallets")
+      .select(
+        "balance"
+      )
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(error);
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("balance")
+    .textContent =
+      Number(
+        data?.balance || 0
+      );
+
+}
+
+
+/* =========================
+   WITHDRAW
+========================= */
+
+async function requestWithdrawal() {
+
+  if (!currentUser) {
+
+    window.location.href =
+      "login.html";
+
+    return;
+
+  }
+
+
+  const amount =
+    Number(
+      document
+        .getElementById(
+          "withdrawAmount"
+        )
+        .value
+    );
+
+
+  const method =
+    document
+      .getElementById(
+        "withdrawMethod"
+      )
+      .value;
+
+
+  const accountDetails =
+    document
+      .getElementById(
+        "accountDetails"
+      )
+      .value
+      .trim();
+
+
+  const message =
+    document
+      .getElementById(
+        "withdrawMessage"
+      );
+
+
+  if (
+    !Number.isInteger(amount) ||
+    amount <= 0
+  ) {
+
+    message.innerHTML =
+      `<div class="status">
+        Enter a valid withdrawal amount.
+      </div>`;
+
+    return;
+
+  }
+
+
+  if (!method) {
+
+    message.innerHTML =
+      `<div class="status">
+        Select a payment method.
+      </div>`;
+
+    return;
+
+  }
+
+
+  if (!accountDetails) {
+
+    message.innerHTML =
+      `<div class="status">
+        Enter your payment account.
+      </div>`;
+
+    return;
+
+  }
+
+
+  message.innerHTML =
+    `<div class="status">
+      Processing...
+    </div>`;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "request_withdrawal",
+      {
+        p_amount: amount,
+        p_method: method,
+        p_account_details:
+          accountDetails
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    message.innerHTML =
+      `<div class="status">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>`;
+
+    return;
+
+  }
+
+
+  message.innerHTML =
+    `<div class="status">
+      ✅ Withdrawal request submitted successfully.
+    </div>`;
+
+
+  document
+    .getElementById(
+      "withdrawAmount"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      "accountDetails"
+    )
+    .value = "";
+
+
+  await loadWallet();
+  await loadWithdrawals();
+
+}
+
+
+/* =========================
+   HISTORY
+========================= */
+
+async function loadWithdrawals() {
+
+  if (!currentUser) return;
+
+
+  const list =
+    document.getElementById(
+      "withdrawalList"
+    );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("withdrawals")
+      .select(`
+        id,
+        amount,
+        method,
+        status,
+        requested_at,
+        processed_at,
+        admin_note
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "requested_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    list.innerHTML =
+      `<div class="status">
+        Unable to load withdrawal history.
+      </div>`;
+
+    return;
+
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    list.innerHTML =
+      `<div class="status">
+        No withdrawal requests yet.
+      </div>`;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    data.map(
+      item => {
+
+        return `
+
+          <div class="history-item">
+
+            💸
+
+            <span class="coin">
+              ${Number(
+                item.amount
+              )} Coins
+            </span>
+
+            <br><br>
+
+            Method:
+            ${escapeHtml(
+              item.method
+            )}
+
+            <br>
+
+            Status:
+            <strong>
+              ${escapeHtml(
+                item.status
+              )}
+            </strong>
+
+            <br>
+
+            Requested:
+            ${formatDate(
+              item.requested_at
+            )}
+
+            ${
+              item.admin_note
+                ? `
+                  <br>
+                  Note:
+                  ${escapeHtml(
+                    item.admin_note
+                  )}
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function escapeHtml(value) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function formatDate(value) {
+
+  if (!value) return "";
+
+  return new Date(
+    value
+  ).toLocaleString();
+
+}
+
+</script>
+
+</body>
+</html>
