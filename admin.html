@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Panel - LSR</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background: #191919;
+      border-bottom: 1px solid #333;
+      padding: 22px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    header p {
+      color: #aaa;
+      margin-bottom: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: #191919;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .admin-name {
+      font-weight: bold;
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .refresh {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .logout {
+      background: #555;
+      color: #fff;
+    }
+
+    .section {
+      background: #191919;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+    }
+
+    .status {
+      background: #242424;
+      border-radius: 9px;
+      padding: 14px;
+      margin: 10px 0;
+      color: #ddd;
+    }
+
+    .submission,
+    .withdrawal,
+    .task {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 12px 0;
+    }
+
+    .submission h3,
+    .withdrawal h3,
+    .task h3 {
+      margin-top: 0;
+    }
+
+    .proof {
+      background: #1d1d1d;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .approve {
+      background: #16a34a;
+      color: white;
+      margin-right: 6px;
+    }
+
+    .reject {
+      background: #dc2626;
+      color: white;
+    }
+
+    .inactive {
+      color: #f87171;
+    }
+
+    .active {
+      color: #4ade80;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 12px;
+      }
+
+      .topbar {
+        align-items: stretch;
+      }
+
+      .topbar button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🛠️ LSR Admin Panel</h1>
+  <p>Manage Micro Tasks & Withdrawals</p>
+</header>
+
+<div class="container">
+
+  <div id="accessStatus" class="status">
+    Checking admin access...
+  </div>
+
+  <div id="adminPanel" class="hidden">
+
+    <div class="topbar">
+
+      <div>
+        👤 Admin:
+        <span id="adminName" class="admin-name">
+          Admin
+        </span>
+      </div>
+
+      <div>
+        <button
+          class="refresh"
+          onclick="loadAdminData()"
+        >
+          🔄 Refresh
+        </button>
+
+        <button
+          class="logout"
+          onclick="adminLogout()"
+        >
+          Logout
+        </button>
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         TASK SUBMISSIONS
+    ========================== -->
+
+    <div class="section">
+
+      <h2>📥 Pending Task Submissions</h2>
+
+      <div id="submissionList">
+        <div class="status">
+          Loading submissions...
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         WITHDRAWALS
+    ========================== -->
+
+    <div class="section">
+
+      <h2>💸 Withdrawal Requests</h2>
+
+      <div id="withdrawalList">
+        <div class="status">
+          Loading withdrawals...
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         TASKS
+    ========================== -->
+
+    <div class="section">
+
+      <h2>📋 Tasks</h2>
+
+      <div id="taskList">
+        <div class="status">
+          Loading tasks...
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
