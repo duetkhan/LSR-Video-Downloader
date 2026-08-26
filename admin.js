@@ -1,3 +1,4 @@
+```javascript
 let supabaseClient = null;
 let adminUser = null;
 
@@ -75,12 +76,13 @@ async function checkAdmin() {
 
   if (!user) {
 
-    showAccess(
-      `You are not logged in.<br><br>
-       <a href="login.html">
-       Login
-       </a>`
-    );
+    showAccess(`
+      ⛔ You are not logged in.
+      <br><br>
+      <a href="login.html">
+        Login
+      </a>
+    `);
 
     return;
   }
@@ -89,9 +91,9 @@ async function checkAdmin() {
   adminUser = user;
 
 
-  /*
-    Check profiles.is_admin
-  */
+  /* =========================
+     CHECK ADMIN ROLE
+  ========================= */
 
   const {
     data: profile,
@@ -99,7 +101,10 @@ async function checkAdmin() {
   } =
     await supabaseClient
       .from("profiles")
-      .select("username, is_admin")
+      .select(`
+        username,
+        is_admin
+      `)
       .eq("id", user.id)
       .maybeSingle();
 
@@ -121,13 +126,19 @@ async function checkAdmin() {
     profile.is_admin !== true
   ) {
 
-    showAccess(
-      "⛔ Access denied. Admin account required."
-    );
+    showAccess(`
+      ⛔ Access denied.
+      <br><br>
+      Admin account required.
+    `);
 
     return;
   }
 
+
+  /* =========================
+     SHOW ADMIN PANEL
+  ========================= */
 
   document
     .getElementById("accessStatus")
@@ -152,7 +163,7 @@ async function checkAdmin() {
 
 
 /* =========================
-   LOAD EVERYTHING
+   LOAD ALL ADMIN DATA
 ========================= */
 
 async function loadAdminData() {
@@ -166,7 +177,7 @@ async function loadAdminData() {
 
 
 /* =========================
-   SUBMISSIONS
+   TASK SUBMISSIONS
 ========================= */
 
 async function loadSubmissions() {
@@ -177,10 +188,11 @@ async function loadSubmissions() {
     );
 
 
-  list.innerHTML =
-    `<div class="status">
+  list.innerHTML = `
+    <div class="status">
       Loading submissions...
-    </div>`;
+    </div>
+  `;
 
 
   const {
@@ -216,11 +228,13 @@ async function loadSubmissions() {
 
     console.error(error);
 
-    list.innerHTML =
-      `<div class="status">
-        Unable to load submissions.<br>
+    list.innerHTML = `
+      <div class="status">
+        ❌ Unable to load submissions.
+        <br><br>
         ${escapeHtml(error.message)}
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -228,10 +242,11 @@ async function loadSubmissions() {
 
   if (!data || data.length === 0) {
 
-    list.innerHTML =
-      `<div class="status">
-        No pending task submissions.
-      </div>`;
+    list.innerHTML = `
+      <div class="status">
+        ✅ No pending task submissions.
+      </div>
+    `;
 
     return;
   }
@@ -249,12 +264,15 @@ async function loadSubmissions() {
         <div class="submission">
 
           <h3>
-            ${escapeHtml(title)}
+            📋 ${escapeHtml(title)}
           </h3>
 
           <p>
             👤 User ID:
-            ${escapeHtml(item.user_id)}
+            <br>
+            <small>
+              ${escapeHtml(item.user_id)}
+            </small>
           </p>
 
           <p>
@@ -271,8 +289,17 @@ async function loadSubmissions() {
           </p>
 
           <div class="proof">
-            <strong>Proof:</strong><br>
-            ${escapeHtml(item.proof || "")}
+
+            <strong>
+              Proof:
+            </strong>
+
+            <br><br>
+
+            ${escapeHtml(
+              item.proof || "No proof provided."
+            )}
+
           </div>
 
           <button
@@ -297,32 +324,69 @@ async function loadSubmissions() {
 
 
 /* =========================
-   APPROVE
+   APPROVE TASK
 ========================= */
 
 async function approveSubmission(id) {
 
-  /*
-    IMPORTANT:
-    Do not directly modify wallet from
-    browser until the secure RPC exists.
-  */
+  const confirmed =
+    confirm(
+      "Approve this task submission?\n\n" +
+      "The task reward will be added to the user's wallet."
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "admin_review_submission",
+      {
+        p_submission_id: id,
+        p_action: "approve",
+        p_note: null
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Approval failed:\n\n" +
+      error.message
+    );
+
+    return;
+  }
+
 
   alert(
-    "Approval action is ready, but the secure database RPC must be connected before coins are added."
+    "✅ Task approved successfully.\n\n" +
+    "Reward has been added to the user's balance."
   );
+
+
+  await loadAdminData();
 }
 
 
 /* =========================
-   REJECT
+   REJECT TASK
 ========================= */
 
 async function rejectSubmission(id) {
 
   const note =
     prompt(
-      "Enter rejection note:"
+      "Enter the reason for rejecting this task:"
     );
 
 
@@ -331,9 +395,44 @@ async function rejectSubmission(id) {
   }
 
 
+  const cleanNote =
+    note.trim() ||
+    "Rejected by admin";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "admin_review_submission",
+      {
+        p_submission_id: id,
+        p_action: "reject",
+        p_note: cleanNote
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Rejection failed:\n\n" +
+      error.message
+    );
+
+    return;
+  }
+
+
   alert(
-    "Rejection action is ready, but the secure database RPC must be connected."
+    "❌ Task submission rejected."
   );
+
+
+  await loadAdminData();
 }
 
 
@@ -349,10 +448,11 @@ async function loadWithdrawals() {
     );
 
 
-  list.innerHTML =
-    `<div class="status">
+  list.innerHTML = `
+    <div class="status">
       Loading withdrawals...
-    </div>`;
+    </div>
+  `;
 
 
   const {
@@ -385,11 +485,13 @@ async function loadWithdrawals() {
 
     console.error(error);
 
-    list.innerHTML =
-      `<div class="status">
-        Unable to load withdrawals.<br>
+    list.innerHTML = `
+      <div class="status">
+        ❌ Unable to load withdrawals.
+        <br><br>
         ${escapeHtml(error.message)}
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -397,10 +499,11 @@ async function loadWithdrawals() {
 
   if (!data || data.length === 0) {
 
-    list.innerHTML =
-      `<div class="status">
-        No pending withdrawals.
-      </div>`;
+    list.innerHTML = `
+      <div class="status">
+        ✅ No pending withdrawals.
+      </div>
+    `;
 
     return;
   }
@@ -413,23 +516,34 @@ async function loadWithdrawals() {
         <div class="withdrawal">
 
           <h3>
-            💸 ${Number(item.amount || 0)}
+            💸
+            ${Number(item.amount || 0)}
             Coins
           </h3>
 
           <p>
             👤 User ID:
-            ${escapeHtml(item.user_id)}
+            <br>
+            <small>
+              ${escapeHtml(item.user_id)}
+            </small>
           </p>
 
           <p>
             💳 Method:
-            ${escapeHtml(item.method)}
+            <strong>
+              ${escapeHtml(
+                item.method || ""
+              )}
+            </strong>
           </p>
 
           <p>
             🏦 Account:
-            ${escapeHtml(item.account_details || "")}
+            <br>
+            ${escapeHtml(
+              item.account_details || ""
+            )}
           </p>
 
           <p>
@@ -459,26 +573,67 @@ async function loadWithdrawals() {
 
 
 /* =========================
-   WITHDRAW APPROVE
+   APPROVE WITHDRAWAL
 ========================= */
 
 async function approveWithdrawal(id) {
 
+  const confirmed =
+    confirm(
+      "Approve this withdrawal?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "admin_review_withdrawal",
+      {
+        p_withdrawal_id: id,
+        p_action: "approve",
+        p_note: null
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Withdrawal approval failed:\n\n" +
+      error.message
+    );
+
+    return;
+  }
+
+
   alert(
-    "Withdrawal approval is ready, but the secure database RPC must be connected before changing the withdrawal status."
+    "✅ Withdrawal approved successfully."
   );
+
+
+  await loadAdminData();
 }
 
 
 /* =========================
-   WITHDRAW REJECT
+   REJECT WITHDRAWAL
 ========================= */
 
 async function rejectWithdrawal(id) {
 
   const note =
     prompt(
-      "Enter rejection note:"
+      "Enter the reason for rejecting this withdrawal:"
     );
 
 
@@ -487,14 +642,50 @@ async function rejectWithdrawal(id) {
   }
 
 
+  const cleanNote =
+    note.trim() ||
+    "Rejected by admin";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "admin_review_withdrawal",
+      {
+        p_withdrawal_id: id,
+        p_action: "reject",
+        p_note: cleanNote
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "❌ Withdrawal rejection failed:\n\n" +
+      error.message
+    );
+
+    return;
+  }
+
+
   alert(
-    "Withdrawal rejection is ready, but the secure database RPC must be connected."
+    "❌ Withdrawal rejected.\n\n" +
+    "The amount has been returned to the user's balance."
   );
+
+
+  await loadAdminData();
 }
 
 
 /* =========================
-   TASKS
+   TASK LIST
 ========================= */
 
 async function loadTasks() {
@@ -505,10 +696,11 @@ async function loadTasks() {
     );
 
 
-  list.innerHTML =
-    `<div class="status">
+  list.innerHTML = `
+    <div class="status">
       Loading tasks...
-    </div>`;
+    </div>
+  `;
 
 
   const {
@@ -521,10 +713,13 @@ async function loadTasks() {
         id,
         title,
         description,
+        instructions,
         reward,
-        status,
+        task_url,
+        proof_type,
         max_completions,
         current_completions,
+        status,
         created_at
       `)
       .order(
@@ -539,11 +734,13 @@ async function loadTasks() {
 
     console.error(error);
 
-    list.innerHTML =
-      `<div class="status">
-        Unable to load tasks.<br>
+    list.innerHTML = `
+      <div class="status">
+        ❌ Unable to load tasks.
+        <br><br>
         ${escapeHtml(error.message)}
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -551,10 +748,11 @@ async function loadTasks() {
 
   if (!data || data.length === 0) {
 
-    list.innerHTML =
-      `<div class="status">
+    list.innerHTML = `
+      <div class="status">
         No tasks found.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -564,8 +762,9 @@ async function loadTasks() {
     data.map(task => {
 
       const status =
-        String(task.status || "")
-          .toLowerCase();
+        String(
+          task.status || ""
+        ).toLowerCase();
 
 
       const statusClass =
@@ -574,11 +773,27 @@ async function loadTasks() {
           : "inactive";
 
 
+      const completed =
+        Number(
+          task.current_completions || 0
+        );
+
+
+      const maximum =
+        task.max_completions === null
+          ? "Unlimited"
+          : Number(
+              task.max_completions
+            );
+
+
       return `
         <div class="task">
 
           <h3>
-            ${escapeHtml(task.title)}
+            ${escapeHtml(
+              task.title
+            )}
           </h3>
 
           <p>
@@ -588,30 +803,57 @@ async function loadTasks() {
           </p>
 
           <p>
+            📝 Instructions:
+            <br>
+            ${escapeHtml(
+              task.instructions || ""
+            )}
+          </p>
+
+          <p>
             🪙 Reward:
-            ${Number(task.reward || 0)}
-            Coins
+            <strong>
+              ${Number(
+                task.reward || 0
+              )}
+              Coins
+            </strong>
+          </p>
+
+          <p>
+            📊 Completed:
+            ${completed}
+            /
+            ${maximum}
           </p>
 
           <p>
             Status:
             <strong class="${statusClass}">
-              ${escapeHtml(task.status)}
+              ${escapeHtml(
+                task.status || ""
+              )}
             </strong>
           </p>
 
-          <p>
-            👥 Completed:
-            ${Number(
-              task.current_completions || 0
-            )}
-            /
-            ${
-              task.max_completions === null
-                ? "Unlimited"
-                : Number(task.max_completions)
-            }
-          </p>
+          ${
+            task.task_url
+              ? `
+                <p>
+                  🔗
+                  <a
+                    href="${safeUrl(
+                      task.task_url
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open Task URL
+                  </a>
+                </p>
+              `
+              : ""
+          }
 
         </div>
       `;
@@ -626,6 +868,17 @@ async function loadTasks() {
 
 async function adminLogout() {
 
+  const confirmed =
+    confirm(
+      "Logout from Admin Panel?"
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
   const {
     error
   } =
@@ -634,8 +887,10 @@ async function adminLogout() {
 
   if (error) {
 
+    console.error(error);
+
     alert(
-      "Logout failed: " +
+      "Logout failed:\n\n" +
       error.message
     );
 
@@ -660,23 +915,25 @@ function showAccess(message) {
     );
 
 
-  if (element) {
-
-    element.innerHTML =
-      message;
-
+  if (!element) {
+    return;
   }
 
+
+  element.innerHTML =
+    message;
 }
 
 
 /* =========================
-   HELPERS
+   HTML ESCAPE
 ========================= */
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
+  return String(
+    value ?? ""
+  )
     .replace(
       /&/g,
       "&amp;"
@@ -700,13 +957,64 @@ function escapeHtml(value) {
 }
 
 
+/* =========================
+   SAFE URL
+========================= */
+
+function safeUrl(value) {
+
+  try {
+
+    const url =
+      new URL(
+        value,
+        window.location.href
+      );
+
+
+    if (
+      url.protocol === "http:" ||
+      url.protocol === "https:"
+    ) {
+
+      return url.href;
+    }
+
+
+    return "#";
+
+  } catch {
+
+    return "#";
+  }
+}
+
+
+/* =========================
+   DATE FORMAT
+========================= */
+
 function formatDate(value) {
 
   if (!value) {
-    return "";
+    return "—";
   }
 
 
-  return new Date(value)
-    .toLocaleString();
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "—";
+  }
+
+
+  return date.toLocaleString();
 }
+```
