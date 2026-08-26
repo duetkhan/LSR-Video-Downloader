@@ -1,11 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Micro Tasks - LSR</title>
+  <title>Micro Tasks</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
@@ -17,682 +17,402 @@
 
     body {
       margin: 0;
-      background: #0d0d0d;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
     }
 
-    a {
-      color: inherit;
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 15px;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
-    header {
-      padding: 25px 15px;
+    h1,
+    h2 {
       text-align: center;
-      background: #191919;
-      border-bottom: 1px solid #333;
     }
-
-    header h1 {
-      margin: 0;
-      font-size: 34px;
-    }
-
-    header p {
-      margin: 8px 0 0;
-      color: #ccc;
-    }
-
 
     /* =========================
-       USER BAR
-    ========================= */
+       USER BOX
+       ========================= */
 
-    .user-bar {
-      max-width: 1000px;
-      margin: 18px auto;
-      padding: 14px 18px;
+    .user-box {
+      background: #fff;
+      border-radius: 15px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
 
       display: flex;
-      justify-content: space-between;
       align-items: center;
-
+      justify-content: space-between;
       gap: 15px;
-
-      background: #191919;
-      border-radius: 12px;
-      border: 1px solid #333;
     }
-
-
-    /* LEFT */
 
     .user-left {
       display: flex;
       align-items: center;
-      gap: 8px;
-
+      gap: 12px;
       min-width: 0;
-      flex: 1;
+    }
+
+    .user-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #eee;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 27px;
+      flex-shrink: 0;
     }
 
     .username {
+      font-size: 20px;
       font-weight: bold;
-      color: #fff;
 
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
+    .user-email {
+      margin-top: 4px;
+      color: #777;
+      font-size: 13px;
 
-    /* RIGHT */
-
-    .user-right {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .balance {
-      color: #ffd43b;
-      font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
+      max-width: 300px;
     }
 
+    .balance-box {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .balance-label {
+      color: #777;
+      font-size: 13px;
+    }
+
+    .balance-value {
+      color: #d99b00;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 3px;
+    }
 
     /* =========================
-       BUTTONS
-    ========================= */
+       AUTH BUTTONS
+       ========================= */
 
-    button,
-    .nav-btn {
-      border: none;
-      border-radius: 8px;
-
-      padding: 10px 14px;
-
-      cursor: pointer;
-
-      text-decoration: none;
-
-      display: inline-block;
-
-      font-size: 14px;
+    .auth-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
+    .auth-buttons a,
+    .auth-buttons button {
+      flex: 1;
+      min-width: 100px;
+
+      padding: 12px;
+      border: 0;
+      border-radius: 9px;
+
+      text-align: center;
+      text-decoration: none;
+
+      font-size: 15px;
+      cursor: pointer;
+    }
 
     .login-btn {
       background: #2563eb;
       color: #fff;
     }
 
-
     .signup-btn {
       background: #16a34a;
       color: #fff;
     }
 
-
-    .logout-btn {
-      background: #555;
-      color: #fff;
-    }
-
-
     .withdraw-btn {
       background: #f59e0b;
       color: #111;
-
-      font-weight: bold;
     }
 
+    .logout-btn {
+      background: #dc2626;
+      color: #fff;
+    }
 
     /* =========================
-       MAIN
-    ========================= */
-
-    .container {
-      max-width: 1000px;
-
-      margin: auto;
-
-      padding: 10px 18px 40px;
-    }
-
-
-    .hero {
-      text-align: center;
-
-      padding: 20px 10px;
-    }
-
-
-    .hero h2 {
-      font-size: 32px;
-
-      margin: 5px 0;
-    }
-
-
-    .hero p {
-      color: #ccc;
-
-      margin: 5px 0;
-    }
-
-
-    /* =========================
-       STATUS
-    ========================= */
-
-    .status {
-      background: #242424;
-
-      padding: 15px;
-
-      border-radius: 10px;
-
-      margin: 10px 0;
-
-      color: #eee;
-    }
-
-
-    /* =========================
-       TASKS
-    ========================= */
-
-    .section-title {
-      margin-top: 35px;
-
-      font-size: 27px;
-    }
-
+       TASK CARD
+       ========================= */
 
     .task-card {
-      background: #1b1b1b;
-
-      border: 1px solid #333;
-
-      border-radius: 14px;
-
-      padding: 20px;
-
+      background: #fff;
+      padding: 18px;
       margin: 15px 0;
+      border-radius: 14px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
     }
-
 
     .task-card h3 {
       margin-top: 0;
-
-      font-size: 22px;
     }
 
-
-    .task-card p {
-      color: #ddd;
-
-      line-height: 1.5;
-    }
-
-
-    .reward {
-      color: #ffd43b;
-
+    .reward,
+    .coin {
       font-weight: bold;
+      color: #d99b00;
     }
 
-
-    .start-task {
-      background: #2563eb;
-
-      color: white;
-
-      font-weight: bold;
-    }
-
-
-    .submit-task {
-      background: #16a34a;
-
-      color: white;
-
-      font-weight: bold;
-    }
-
-
-    .task-details {
-      margin-top: 18px;
-
-      padding-top: 15px;
-
-      border-top: 1px solid #333;
-    }
-
-
-    .task-details textarea {
-      width: 100%;
-
-      min-height: 100px;
-
-      resize: vertical;
-
-      padding: 12px;
-
+    .task-card button {
+      padding: 11px 15px;
+      border: 0;
       border-radius: 8px;
-
-      border: 1px solid #555;
-
-      background: #111;
-
-      color: white;
-
-      margin: 10px 0;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 8px;
     }
 
-
-    .task-link {
+    .task-card a {
       display: inline-block;
-
-      background: #9333ea;
-
-      color: white;
-
-      padding: 10px 14px;
-
-      border-radius: 8px;
-
-      text-decoration: none;
-
       margin: 8px 0;
+      color: #2563eb;
+      font-weight: bold;
     }
 
+    textarea {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      resize: vertical;
+    }
 
     .hidden {
-      display: none !important;
+      display: none;
     }
 
-
-    /* =========================
-       HISTORY
-    ========================= */
-
-    .history-item {
-      background: #1b1b1b;
-
-      border: 1px solid #333;
-
+    .status {
+      background: #fff;
+      padding: 13px;
       border-radius: 10px;
-
-      padding: 14px;
-
       margin: 10px 0;
     }
 
-
-    /* =========================
-       ADS
-    ========================= */
-
-    .ad-box {
-      width: 100%;
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      margin: 20px auto;
-
-      overflow: hidden;
-    }
-
-
-    /* =========================
-       FOOTER
-    ========================= */
-
-    footer {
+    .back {
+      display: block;
       text-align: center;
-
-      padding: 25px;
-
-      color: #888;
-
-      border-top: 1px solid #222;
-
-      margin-top: 30px;
+      margin: 25px 0;
+      text-decoration: none;
+      color: #2563eb;
     }
 
+    @media (max-width: 600px) {
 
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 650px) {
-
-      header h1 {
-        font-size: 27px;
+      .user-box {
+        padding: 13px;
       }
 
-
-      .user-bar {
-        align-items: center;
-
-        padding: 12px;
+      .username {
+        font-size: 17px;
+        max-width: 160px;
       }
 
-
-      .user-left {
-        min-width: 0;
+      .user-email {
+        max-width: 160px;
+        font-size: 12px;
       }
 
-
-      .user-right {
-        flex-shrink: 0;
-
-        justify-content: flex-end;
+      .balance-value {
+        font-size: 17px;
       }
 
-
-      .user-right button,
-      .user-right a {
-        text-align: center;
-      }
-
-
-      .balance {
-        width: 100%;
-
-        text-align: right;
-
-        margin-bottom: 3px;
-      }
-
-
-      .hero h2 {
-        font-size: 27px;
-      }
-
-    }
-
-
-    @media (max-width: 430px) {
-
-      .user-bar {
-        flex-direction: row;
-
-        align-items: flex-start;
-      }
-
-
-      .user-left {
-        padding-top: 8px;
-      }
-
-
-      .user-right {
+      .auth-buttons {
         flex-direction: column;
-
-        align-items: stretch;
       }
-
-
-      .balance {
-        text-align: center;
-      }
-
-
-      .user-right button,
-      .user-right a {
-        width: 100%;
-      }
-
     }
-
   </style>
 </head>
 
-
 <body>
 
+<div class="container">
 
-<!-- =========================
-     HEADER
-========================= -->
-
-<header>
-
-  <h1>
-    🪙 Micro Tasks
-  </h1>
-
-  <p>
-    Complete tasks and earn coins
-  </p>
-
-</header>
+  <h1>🪙 Micro Tasks</h1>
 
 
+  <!-- =========================
+       USER BOX
+       ========================= -->
 
-<!-- =========================
-     USER BAR
-========================= -->
+  <div class="user-box">
 
-<div class="user-bar">
+    <div class="user-left">
+
+      <div class="user-icon">
+        👤
+      </div>
+
+      <div>
+
+        <div
+          id="displayUsername"
+          class="username"
+        >
+          Guest
+        </div>
+
+        <div
+          id="displayEmail"
+          class="user-email"
+          style="display:none;"
+        ></div>
+
+      </div>
+
+    </div>
 
 
-  <!-- LEFT: USERNAME -->
+    <div class="balance-box">
 
-  <div class="user-left">
+      <div class="balance-label">
+        Balance
+      </div>
 
-    <span>
-      👤
-    </span>
+      <div class="balance-value">
+        <span id="balance">0</span> Coins
+      </div>
 
-    <span
-      id="username"
-      class="username"
-    >
-      Guest
-    </span>
+    </div>
 
   </div>
 
 
+  <!-- =========================
+       GUEST BUTTONS
+       ========================= -->
 
-  <!-- RIGHT: BALANCE + BUTTONS -->
-
-  <div class="user-right">
-
-
-    <span class="balance">
-
-      🪙
-
-      <span id="balance">
-        0
-      </span>
-
-      Coins
-
-    </span>
-
+  <div
+    id="guestButtons"
+    class="auth-buttons"
+  >
 
     <a
       href="login.html"
-      id="loginButton"
-      class="nav-btn login-btn"
+      class="login-btn"
     >
       Login
     </a>
 
-
     <a
       href="signup.html"
-      id="signupButton"
-      class="nav-btn signup-btn"
+      class="signup-btn"
     >
       Sign Up
     </a>
 
-
-    <button
-      id="logoutButton"
-      class="logout-btn hidden"
-      onclick="logoutUser()"
-    >
-      Logout
-    </button>
-
-
     <a
       href="withdraw.html"
-      class="nav-btn withdraw-btn"
+      class="withdraw-btn"
     >
       💸 Withdraw
     </a>
 
   </div>
 
-</div>
 
+  <!-- =========================
+       LOGGED-IN BUTTONS
+       ========================= -->
 
+  <div
+    id="userButtons"
+    class="auth-buttons"
+    style="display:none;"
+  >
 
-<!-- =========================
-     TOP AD
-========================= -->
+    <button
+      type="button"
+      class="logout-btn"
+      onclick="logoutUser()"
+    >
+      Logout
+    </button>
 
-<div class="ad-box">
-
-  <script>
-    atOptions = {
-      'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-      'format': 'iframe',
-      'height': 50,
-      'width': 320,
-      'params': {}
-    };
-  </script>
-
-  <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
-
-</div>
-
-
-
-<!-- =========================
-     MAIN
-========================= -->
-
-<div class="container">
-
-
-  <div class="hero">
-
-    <h2>
-      📋 Available Tasks
-    </h2>
-
-    <p>
-      Browse available tasks and earn coins.
-    </p>
+    <a
+      href="withdraw.html"
+      class="withdraw-btn"
+    >
+      💸 Withdraw
+    </a>
 
   </div>
 
 
+  <!-- =========================
+       STATUS
+       ========================= -->
+
+  <div id="userStatus"></div>
+
 
   <!-- =========================
-       TASK LIST
-  ========================= -->
+       TASKS
+       ========================= -->
 
-  <h2 class="section-title">
-    📋 Tasks
+  <h2>
+    📋 Available Tasks
   </h2>
 
-
   <div id="taskList">
-
     <div class="status">
       Loading tasks...
     </div>
-
   </div>
-
 
 
   <!-- =========================
-       TASK HISTORY
-  ========================= -->
+       SUBMISSIONS
+       ========================= -->
 
-  <h2 class="section-title">
-    📌 My Task History
+  <h2>
+    📜 My Task History
   </h2>
 
-
   <div id="submissionList">
-
     <div class="status">
-      Login to see your task history.
+      Login to view your task history.
     </div>
-
   </div>
 
 
-</div>
-
-
-
-<!-- =========================
-     BOTTOM AD
-========================= -->
-
-<div class="ad-box">
-
-  <script>
-    atOptions = {
-      'key': '3f673e5d02626eb857acc774c36f56a6',
-      'format': 'iframe',
-      'height': 60,
-      'width': 468,
-      'params': {}
-    };
-  </script>
-
-  <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+  <a
+    href="index.html"
+    class="back"
+  >
+    ← Back to Home
+  </a>
 
 </div>
 
-
-
-<!-- =========================
-     FOOTER
-========================= -->
-
-<footer>
-
-  © 2026 LSR Earning Point
-
-</footer>
-
-
-
-<!-- =========================
-     JAVASCRIPT
-========================= -->
 
 <script src="tasks.js"></script>
 
-
 </body>
-
 </html>
+```
