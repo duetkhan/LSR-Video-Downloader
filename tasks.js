@@ -1,10 +1,25 @@
 let supabaseClient = null;
 let currentUser = null;
 
+
+/* =========================
+   INITIALIZE
+========================= */
+
 document.addEventListener("DOMContentLoaded", async () => {
+
   try {
+
     if (typeof supabase === "undefined") {
       showUserStatus("Supabase library failed to load.");
+      return;
+    }
+
+    if (
+      typeof SUPABASE_URL === "undefined" ||
+      typeof SUPABASE_PUBLISHABLE_KEY === "undefined"
+    ) {
+      showUserStatus("Supabase configuration is missing.");
       return;
     }
 
@@ -13,557 +28,837 @@ document.addEventListener("DOMContentLoaded", async () => {
       SUPABASE_PUBLISHABLE_KEY
     );
 
-    await checkUser();
+    /*
+     * Check current login session.
+     *
+     * Supabase keeps the browser session automatically,
+     * so the user does not need to login on every visit.
+     */
+
+    const {
+      data: { session }
+    } = await supabaseClient.auth.getSession();
+
+    if (session && session.user) {
+
+      currentUser = session.user;
+
+      updateLoggedInUI();
+
+      await loadWallet();
+      await loadSubmissions();
+
+    } else {
+
+      currentUser = null;
+
+      updateLoggedOutUI();
+
+    }
+
+    /*
+     * Tasks are public.
+     * Logged-out users can see them.
+     */
+
+    await loadTasks();
+
+
+    /*
+     * Listen for login/logout changes.
+     */
+
+    supabaseClient.auth.onAuthStateChange(
+      async (event, session) => {
+
+        if (session && session.user) {
+
+          currentUser = session.user;
+
+          updateLoggedInUI();
+
+          await loadWallet();
+          await loadSubmissions();
+
+        } else {
+
+          currentUser = null;
+
+          updateLoggedOutUI();
+
+          document.getElementById("balance").textContent = "0";
+
+          document.getElementById("submissionList").innerHTML =
+            `<div class="status">
+              Login to see your task history.
+            </div>`;
+
+        }
+
+      }
+    );
+
+
   } catch (error) {
+
     console.error(error);
-    showUserStatus("Unable to connect to the task system.");
+
+    showUserStatus(
+      "Unable to connect to the task system."
+    );
+
   }
+
 });
 
 
 /* =========================
-   AUTH
-   ========================= */
+   UI - LOGGED OUT
+========================= */
 
-async function checkUser() {
-  const {
-    data: { user },
-    error
-  } = await supabaseClient.auth.getUser();
+function updateLoggedOutUI() {
 
-  if (error) {
-    console.error(error);
+  const username =
+    document.getElementById("username");
+
+  const loginButton =
+    document.getElementById("loginButton");
+
+  const signupButton =
+    document.getElementById("signupButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+
+  if (username) {
+    username.textContent = "Guest";
   }
 
-  if (!user) {
-    currentUser = null;
+  if (loginButton) {
+    loginButton.classList.remove("hidden");
+  }
 
-    showUserStatus(
-      `You are not logged in. <a href="index.html">Go to Home</a>`
+  if (signupButton) {
+    signupButton.classList.remove("hidden");
+  }
+
+  if (logoutButton) {
+    logoutButton.classList.add("hidden");
+  }
+
+
+  showUserStatus(
+    `You are not logged in. Start a task and login when required.`
+  );
+
+}
+
+
+/* =========================
+   UI - LOGGED IN
+========================= */
+
+function updateLoggedInUI() {
+
+  if (!currentUser) return;
+
+
+  const usernameElement =
+    document.getElementById("username");
+
+  const loginButton =
+    document.getElementById("loginButton");
+
+  const signupButton =
+    document.getElementById("signupButton");
+
+  const logoutButton =
+    document.getElementById("logoutButton");
+
+
+  /*
+   * Username comes from Supabase Auth metadata.
+   */
+
+  const metadata =
+    currentUser.user_metadata || {};
+
+  const username =
+    metadata.username ||
+    currentUser.email ||
+    "User";
+
+
+  if (usernameElement) {
+    usernameElement.textContent = username;
+  }
+
+
+  if (loginButton) {
+    loginButton.classList.add("hidden");
+  }
+
+  if (signupButton) {
+    signupButton.classList.add("hidden");
+  }
+
+  if (logoutButton) {
+    logoutButton.classList.remove("hidden");
+  }
+
+
+  showUserStatus(
+    `Logged in as: ${escapeHtml(username)}`
+  );
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutUser() {
+
+  if (!supabaseClient) return;
+
+
+  const { error } =
+    await supabaseClient.auth.signOut();
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to logout: " +
+      error.message
     );
-
-    document.getElementById("taskList").innerHTML =
-      `<div class="status">Please login first to access Micro Tasks.</div>`;
-
-    document.getElementById("submissionList").innerHTML =
-      `<div class="status">Login required.</div>`;
 
     return;
   }
 
-  currentUser = user;
 
-  showUserStatus(
-    `Logged in as: ${escapeHtml(user.email || "User")}`
-  );
+  /*
+   * Supabase removes the local auth session.
+   */
 
-  await loadWallet();
-  await loadTasks();
-  await loadSubmissions();
-  await loadWithdrawals();
+  currentUser = null;
+
+  updateLoggedOutUI();
+
+  document.getElementById("balance").textContent = "0";
+
+  document.getElementById("submissionList").innerHTML =
+    `<div class="status">
+      Login to see your task history.
+    </div>`;
+
 }
 
 
 /* =========================
    WALLET
-   ========================= */
+========================= */
 
 async function loadWallet() {
+
   if (!currentUser) return;
 
-  const { data, error } = await supabaseClient
-    .from("wallets")
-    .select("balance, pending_balance, total_earned, total_withdrawn")
-    .eq("user_id", currentUser.id)
-    .single();
+
+  const { data, error } =
+    await supabaseClient
+      .from("wallets")
+      .select(`
+        balance,
+        pending_balance,
+        total_earned,
+        total_withdrawn
+      `)
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
 
   if (error) {
-    console.error(error);
+
+    console.error("Wallet error:", error);
+
     return;
   }
 
-  const balance = Number(data.balance || 0);
 
-  document.getElementById("balance").textContent = balance;
-  document.getElementById("withdrawBalance").textContent = balance;
+  if (!data) {
+
+    document.getElementById("balance").textContent = "0";
+
+    return;
+  }
+
+
+  const balance =
+    Number(data.balance || 0);
+
+
+  document.getElementById("balance").textContent =
+    balance;
+
 }
 
 
 /* =========================
-   TASKS
-   ========================= */
+   LOAD TASKS
+========================= */
 
 async function loadTasks() {
-  const taskList = document.getElementById("taskList");
+
+  const taskList =
+    document.getElementById("taskList");
+
+
+  if (!taskList) return;
+
 
   taskList.innerHTML =
-    `<div class="status">Loading tasks...</div>`;
+    `<div class="status">
+      Loading tasks...
+    </div>`;
 
-  const { data, error } = await supabaseClient
-    .from("tasks")
-    .select(`
-      id,
-      title,
-      description,
-      instructions,
-      reward,
-      task_url,
-      proof_type,
-      max_completions,
-      current_completions,
-      status
-    `)
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
+
+  const { data, error } =
+    await supabaseClient
+      .from("tasks")
+      .select(`
+        id,
+        title,
+        description,
+        instructions,
+        reward,
+        task_url,
+        proof_type,
+        max_completions,
+        current_completions,
+        status
+      `)
+      .eq("status", "active")
+      .order("created_at", {
+        ascending: false
+      });
+
 
   if (error) {
-    console.error(error);
+
+    console.error("Task loading error:", error);
 
     taskList.innerHTML =
-      `<div class="status">Unable to load tasks.</div>`;
+      `<div class="status">
+        Unable to load tasks.
+      </div>`;
 
     return;
   }
+
 
   if (!data || data.length === 0) {
+
     taskList.innerHTML =
-      `<div class="status">No tasks available right now.</div>`;
+      `<div class="status">
+        No tasks available right now.
+      </div>`;
 
     return;
   }
 
-  taskList.innerHTML = data.map(task => {
 
-    const remaining =
-      task.max_completions === null
-        ? "Unlimited"
-        : Math.max(
+  taskList.innerHTML =
+    data.map(task => {
+
+      const taskId =
+        Number(task.id);
+
+
+      let remaining =
+        "Unlimited";
+
+
+      if (task.max_completions !== null) {
+
+        remaining =
+          Math.max(
             0,
             Number(task.max_completions) -
             Number(task.current_completions || 0)
           );
 
-    return `
-      <div class="task-card">
+      }
 
-        <h3>${escapeHtml(task.title)}</h3>
 
-        <p>
-          ${escapeHtml(task.description || "")}
-        </p>
+      return `
 
-        <p>
-          🎁 Reward:
-          <span class="reward">
-            ${Number(task.reward)} Coins
-          </span>
-        </p>
+        <div class="task-card">
 
-        <p>
-          👥 Remaining:
-          ${remaining}
-        </p>
+          <h3>
+            ${escapeHtml(task.title)}
+          </h3>
 
-        <button onclick="openTask(${Number(task.id)})">
-          ▶ Start Task
-        </button>
 
-        <div id="task-${Number(task.id)}" class="hidden">
+          <p>
+            ${escapeHtml(
+              task.description || ""
+            )}
+          </p>
 
-          ${
-            task.task_url
-              ? `
-                <p>
+
+          <p>
+            🎁 Reward:
+
+            <span class="reward">
+              ${Number(task.reward || 0)} Coins
+            </span>
+          </p>
+
+
+          <p>
+            👥 Remaining:
+            ${remaining}
+          </p>
+
+
+          <button
+            class="start-task"
+            onclick="startTask(${taskId})"
+          >
+            ▶ Start Task
+          </button>
+
+
+          <div
+            id="task-${taskId}"
+            class="task-details hidden"
+          >
+
+            ${
+              task.task_url
+                ? `
                   <a
+                    class="task-link"
                     href="${safeUrl(task.task_url)}"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     🔗 Open Task
                   </a>
-                </p>
-              `
-              : ""
-          }
+                `
+                : ""
+            }
 
-          <p>
-            <strong>Instructions:</strong>
-          </p>
 
-          <p>
-            ${escapeHtml(task.instructions || "Complete the task and submit proof.")}
-          </p>
+            <p>
+              <strong>
+                Instructions:
+              </strong>
+            </p>
 
-          <textarea
-            id="proof-${Number(task.id)}"
-            rows="4"
-            placeholder="Enter your proof here..."
-          ></textarea>
 
-          <button onclick="submitTask(${Number(task.id)})">
-            ✅ Submit Task
-          </button>
+            <p>
+              ${escapeHtml(
+                task.instructions ||
+                "Complete the task and submit proof."
+              )}
+            </p>
 
-          <div id="result-${Number(task.id)}"></div>
+
+            <textarea
+              id="proof-${taskId}"
+              placeholder="Enter your proof here..."
+            ></textarea>
+
+
+            <button
+              class="submit-task"
+              onclick="submitTask(${taskId})"
+            >
+              ✅ Submit Task
+            </button>
+
+
+            <div
+              id="result-${taskId}"
+            ></div>
+
+          </div>
 
         </div>
 
-      </div>
-    `;
-  }).join("");
+      `;
+
+    }).join("");
+
 }
 
 
 /* =========================
-   OPEN TASK
-   ========================= */
+   START TASK
+========================= */
 
-function openTask(taskId) {
-  const box = document.getElementById(`task-${taskId}`);
+async function startTask(taskId) {
+
+  /*
+   * IMPORTANT:
+   * Tasks remain visible to everyone.
+   *
+   * Login is required only when the user
+   * actually wants to start the task.
+   */
+
+  if (!currentUser) {
+
+    const login =
+      confirm(
+        "You need to login to start this task.\n\n" +
+        "Press OK to Login.\n" +
+        "Press Cancel to Sign Up."
+      );
+
+
+    if (login) {
+
+      window.location.href =
+        "login.html";
+
+    } else {
+
+      window.location.href =
+        "signup.html";
+
+    }
+
+    return;
+  }
+
+
+  const box =
+    document.getElementById(
+      `task-${taskId}`
+    );
+
 
   if (!box) return;
 
+
   box.classList.toggle("hidden");
+
 }
 
 
 /* =========================
    SUBMIT TASK
-   ========================= */
+========================= */
 
 async function submitTask(taskId) {
+
   if (!currentUser) {
-    alert("Please login first.");
+
+    alert(
+      "Please login before submitting a task."
+    );
+
     return;
   }
+
 
   const proofElement =
-    document.getElementById(`proof-${taskId}`);
+    document.getElementById(
+      `proof-${taskId}`
+    );
+
 
   const resultElement =
-    document.getElementById(`result-${taskId}`);
+    document.getElementById(
+      `result-${taskId}`
+    );
+
 
   const proof =
-    proofElement ? proofElement.value.trim() : "";
+    proofElement
+      ? proofElement.value.trim()
+      : "";
+
 
   if (!proof) {
+
     resultElement.innerHTML =
-      `<div class="status">Please enter your proof.</div>`;
+      `<div class="status">
+        Please enter your proof.
+      </div>`;
 
     return;
   }
 
-  resultElement.innerHTML =
-    `<div class="status">Submitting...</div>`;
-
-  const { data, error } = await supabaseClient.rpc(
-    "submit_task",
-    {
-      p_task_id: taskId,
-      p_proof: proof
-    }
-  );
-
-  if (error) {
-    console.error(error);
-
-    resultElement.innerHTML =
-      `<div class="status">${escapeHtml(error.message)}</div>`;
-
-    return;
-  }
 
   resultElement.innerHTML =
     `<div class="status">
-      ✅ Submitted successfully. Your task is now pending review.
+      Submitting...
     </div>`;
 
-  proofElement.value = "";
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      "submit_task",
+      {
+        p_task_id: taskId,
+        p_proof: proof
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+    resultElement.innerHTML =
+      `<div class="status">
+        ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  resultElement.innerHTML =
+    `<div class="status">
+      ✅ Task submitted successfully.
+      <br>
+      Your submission is pending review.
+    </div>`;
+
+
+  if (proofElement) {
+    proofElement.value = "";
+  }
+
 
   await loadSubmissions();
+
 }
 
 
 /* =========================
-   SUBMISSIONS
-   ========================= */
+   TASK HISTORY
+========================= */
 
 async function loadSubmissions() {
+
   if (!currentUser) return;
+
 
   const submissionList =
-    document.getElementById("submissionList");
+    document.getElementById(
+      "submissionList"
+    );
 
-  const { data, error } = await supabaseClient
-    .from("task_submissions")
-    .select(`
-      id,
-      task_id,
-      reward,
-      status,
-      submitted_at,
-      reviewed_at,
-      review_note,
-      tasks (
-        title
+
+  if (!submissionList) return;
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("task_submissions")
+      .select(`
+        id,
+        task_id,
+        reward,
+        status,
+        submitted_at,
+        reviewed_at,
+        review_note,
+        tasks (
+          title
+        )
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
       )
-    `)
-    .eq("user_id", currentUser.id)
-    .order("submitted_at", { ascending: false });
+      .order(
+        "submitted_at",
+        {
+          ascending: false
+        }
+      );
+
 
   if (error) {
-    console.error(error);
+
+    console.error(
+      "Submission history error:",
+      error
+    );
 
     submissionList.innerHTML =
-      `<div class="status">Unable to load task history.</div>`;
+      `<div class="status">
+        Unable to load task history.
+      </div>`;
 
     return;
   }
 
+
   if (!data || data.length === 0) {
+
     submissionList.innerHTML =
-      `<div class="status">No task submissions yet.</div>`;
+      `<div class="status">
+        No task submissions yet.
+      </div>`;
 
     return;
   }
 
-  submissionList.innerHTML = data.map(item => {
 
-    const title =
-      item.tasks?.title || "Task";
+  submissionList.innerHTML =
+    data.map(item => {
 
-    return `
-      <div class="status">
+      const title =
+        item.tasks?.title ||
+        "Task";
 
-        <strong>
-          ${escapeHtml(title)}
-        </strong>
 
-        <br>
+      return `
 
-        Reward:
-        <span class="coin">
-          ${Number(item.reward)} Coins
-        </span>
+        <div class="history-item">
 
-        <br>
+          <strong>
+            ${escapeHtml(title)}
+          </strong>
 
-        Status:
-        <strong>
-          ${escapeHtml(item.status)}
-        </strong>
+          <br><br>
 
-        <br>
+          Reward:
 
-        Submitted:
-        ${formatDate(item.submitted_at)}
+          <span class="reward">
+            ${Number(item.reward || 0)}
+            Coins
+          </span>
 
-        ${
-          item.review_note
-            ? `<br>Note: ${escapeHtml(item.review_note)}`
-            : ""
-        }
+          <br>
 
-      </div>
-    `;
-  }).join("");
+          Status:
+
+          <strong>
+            ${escapeHtml(
+              item.status || ""
+            )}
+          </strong>
+
+          <br>
+
+          Submitted:
+          ${formatDate(
+            item.submitted_at
+          )}
+
+          ${
+            item.review_note
+              ? `
+                <br>
+                Note:
+                ${escapeHtml(
+                  item.review_note
+                )}
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    }).join("");
+
 }
 
 
 /* =========================
-   WITHDRAWAL
-   ========================= */
-
-async function requestWithdrawal() {
-  if (!currentUser) {
-    alert("Please login first.");
-    return;
-  }
-
-  const method =
-    document.getElementById("withdrawMethod").value;
-
-  const accountDetails =
-    document.getElementById("accountDetails").value.trim();
-
-  const amount =
-    Number(document.getElementById("withdrawAmount").value);
-
-  const message =
-    document.getElementById("withdrawMessage");
-
-  if (!method) {
-    message.innerHTML =
-      `<div class="status">Select a payment method.</div>`;
-    return;
-  }
-
-  if (!accountDetails) {
-    message.innerHTML =
-      `<div class="status">Enter your payment account.</div>`;
-    return;
-  }
-
-  if (!Number.isInteger(amount) || amount <= 0) {
-    message.innerHTML =
-      `<div class="status">Enter a valid withdrawal amount.</div>`;
-    return;
-  }
-
-  message.innerHTML =
-    `<div class="status">Processing withdrawal...</div>`;
-
-  const { data, error } = await supabaseClient.rpc(
-    "request_withdrawal",
-    {
-      p_amount: amount,
-      p_method: method,
-      p_account_details: accountDetails
-    }
-  );
-
-  if (error) {
-    console.error(error);
-
-    message.innerHTML =
-      `<div class="status">${escapeHtml(error.message)}</div>`;
-
-    return;
-  }
-
-  message.innerHTML =
-    `<div class="status">
-      ✅ Withdrawal request submitted successfully.
-    </div>`;
-
-  document.getElementById("withdrawAmount").value = "";
-  document.getElementById("accountDetails").value = "";
-
-  await loadWallet();
-  await loadWithdrawals();
-}
-
-
-/* =========================
-   WITHDRAWAL HISTORY
-   ========================= */
-
-async function loadWithdrawals() {
-  if (!currentUser) return;
-
-  const list =
-    document.getElementById("withdrawalList");
-
-  const { data, error } = await supabaseClient
-    .from("withdrawals")
-    .select(`
-      id,
-      amount,
-      method,
-      status,
-      requested_at,
-      processed_at,
-      admin_note
-    `)
-    .eq("user_id", currentUser.id)
-    .order("requested_at", { ascending: false });
-
-  if (error) {
-    console.error(error);
-
-    list.innerHTML =
-      `<div class="status">Unable to load withdrawals.</div>`;
-
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    list.innerHTML =
-      `<div class="status">No withdrawal requests yet.</div>`;
-
-    return;
-  }
-
-  list.innerHTML = data.map(item => {
-
-    return `
-      <div class="status">
-
-        💸 ${Number(item.amount)} Coins
-
-        <br>
-
-        Method:
-        ${escapeHtml(item.method)}
-
-        <br>
-
-        Status:
-        <strong>
-          ${escapeHtml(item.status)}
-        </strong>
-
-        <br>
-
-        Requested:
-        ${formatDate(item.requested_at)}
-
-        ${
-          item.admin_note
-            ? `<br>Admin note: ${escapeHtml(item.admin_note)}`
-            : ""
-        }
-
-      </div>
-    `;
-  }).join("");
-}
-
-
-/* =========================
-   HELPERS
-   ========================= */
+   STATUS
+========================= */
 
 function showUserStatus(message) {
+
   const element =
-    document.getElementById("userStatus");
+    document.getElementById(
+      "userStatus"
+    );
+
 
   if (element) {
-    element.innerHTML = message;
+
+    element.innerHTML =
+      message;
+
   }
+
 }
 
 
+/* =========================
+   HTML ESCAPE
+========================= */
+
 function escapeHtml(value) {
+
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 }
 
 
+/* =========================
+   SAFE URL
+========================= */
+
 function safeUrl(value) {
+
   try {
-    const url = new URL(value);
+
+    const url =
+      new URL(value);
+
 
     if (
       url.protocol === "https:" ||
       url.protocol === "http:"
     ) {
+
       return url.href;
+
     }
 
+
     return "#";
+
   } catch {
+
     return "#";
+
   }
+
 }
 
 
+/* =========================
+   DATE
+========================= */
+
 function formatDate(value) {
+
   if (!value) return "";
 
-  return new Date(value).toLocaleString();
+  return new Date(value)
+    .toLocaleString();
+
 }
