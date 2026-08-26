@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LSR Micro Tasks</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .task-page {
+      width: 92%;
+      max-width: 900px;
+      margin: 25px auto;
+    }
+
+    .account-box,
+    .task-card,
+    .withdraw-box,
+    .history-box {
+      background: #1b1b1b;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.25);
+    }
+
+    .balance {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .coin {
+      color: #ffd54a;
+    }
+
+    .task-card h3 {
+      margin-top: 0;
+    }
+
+    .reward {
+      color: #ffd54a;
+      font-weight: bold;
+    }
+
+    .task-card button,
+    .withdraw-box button {
+      width: 100%;
+      padding: 13px;
+      border: 0;
+      border-radius: 10px;
+      margin-top: 10px;
+      background: linear-gradient(135deg,#ff512f,#dd2476);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .task-card input,
+    .task-card textarea,
+    .withdraw-box input,
+    .withdraw-box select {
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .status {
+      padding: 10px;
+      border-radius: 8px;
+      background: #292929;
+      margin-top: 10px;
+    }
+
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      color: white;
+      text-decoration: none;
+    }
+
+    .section-title {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🪙 Micro Tasks</h1>
+  <p>Complete tasks and earn coins</p>
+</header>
+
+<div class="task-page">
+
+  <!-- ACCOUNT -->
+  <div class="account-box">
+    <h2>💰 Your Balance</h2>
+
+    <div class="balance">
+      <span id="balance">0</span>
+      <span class="coin">Coins</span>
+    </div>
+
+    <p id="userStatus">Checking account...</p>
+  </div>
+
+
+  <!-- AVAILABLE TASKS -->
+  <h2 class="section-title">📋 Available Tasks</h2>
+
+  <div id="taskList">
+    <div class="status">Loading tasks...</div>
+  </div>
+
+
+  <!-- MY SUBMISSIONS -->
+  <h2 class="section-title">📌 My Task History</h2>
+
+  <div id="submissionList">
+    <div class="status">Loading history...</div>
+  </div>
+
+
+  <!-- WITHDRAW -->
+  <h2 class="section-title">💸 Withdraw</h2>
+
+  <div class="withdraw-box">
+
+    <p>Available Balance:</p>
+
+    <strong>
+      <span id="withdrawBalance">0</span> Coins
+    </strong>
+
+    <select id="withdrawMethod">
+      <option value="">Select payment method</option>
+      <option value="bKash">bKash</option>
+      <option value="Nagad">Nagad</option>
+      <option value="Rocket">Rocket</option>
+      <option value="PayPal">PayPal</option>
+    </select>
+
+    <input
+      type="text"
+      id="accountDetails"
+      placeholder="Payment account number/email"
+    >
+
+    <input
+      type="number"
+      id="withdrawAmount"
+      placeholder="Amount in coins"
+      min="1"
+    >
+
+    <button onclick="requestWithdrawal()">
+      💸 Request Withdrawal
+    </button>
+
+    <div id="withdrawMessage"></div>
+
+  </div>
+
+
+  <!-- WITHDRAWAL HISTORY -->
+  <h2 class="section-title">📜 Withdrawal History</h2>
+
+  <div id="withdrawalList">
+    <div class="status">Loading...</div>
+  </div>
+
+</div>
+
+
+<a href="index.html" class="back-btn">
+  ← Back to Home
+</a>
+
+
+<!-- =========================
+     ADSTERRA BOTTOM BANNER
+     ========================= -->
+
+<div class="ad-box">
+
+<script>
+atOptions = {
+  'key' : '3f673e5d02626eb857acc774c36f56a6',
+  'format' : 'iframe',
+  'height' : 60,
+  'width' : 468,
+  'params' : {}
+};
+</script>
+
+<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+
+</div>
+
+
+<footer>
+  © 2026 LSR Earning Point
+</footer>
+
+
+<script src="supabase-config.js"></script>
+<script src="tasks.js"></script>
+
+</body>
+</html>
