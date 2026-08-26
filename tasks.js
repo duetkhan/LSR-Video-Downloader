@@ -4,32 +4,44 @@ let currentUser = null;
 
 
 /* =========================
-   INIT
+   START
 ========================= */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-  try {
+    try {
 
-    if (typeof supabase === "undefined") {
-      console.error("Supabase library failed to load.");
-      return;
+      if (typeof supabase === "undefined") {
+
+        showUserStatus(
+          "Supabase library failed to load."
+        );
+
+        return;
+      }
+
+
+      supabaseClient =
+        supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_PUBLISHABLE_KEY
+        );
+
+
+      await checkUser();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showUserStatus(
+        "Unable to connect to the task system."
+      );
     }
-
-    supabaseClient = supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-
-    await checkUser();
-
-  } catch (error) {
-
-    console.error(error);
-
   }
-
-});
+);
 
 
 /* =========================
@@ -39,146 +51,227 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkUser() {
 
   const {
-    data: { user },
+    data: {
+      user
+    },
     error
-  } = await supabaseClient.auth.getUser();
+  } =
+    await supabaseClient.auth.getUser();
 
 
   if (error) {
+
     console.error(error);
+
   }
 
-
-  /* =========================
-     GUEST
-  ========================= */
 
   if (!user) {
 
     currentUser = null;
 
-    updateUserBar();
 
-    /*
-      IMPORTANT:
-      Guest can see tasks.
-      Only starting/submitting a task requires login.
-    */
+    showUserStatus(
+      `You are not logged in.
+       <a href="index.html">
+       Go to Home
+       </a>`
+    );
 
-    await loadTasks();
 
-    document.getElementById("submissionList").innerHTML =
-      `<div class="status">Login to see your task history.</div>`;
+    const taskList =
+      document.getElementById(
+        "taskList"
+      );
+
+    if (taskList) {
+
+      taskList.innerHTML =
+        `<div class="status">
+          Please login first to access Micro Tasks.
+        </div>`;
+    }
+
+
+    const submissionList =
+      document.getElementById(
+        "submissionList"
+      );
+
+    if (submissionList) {
+
+      submissionList.innerHTML =
+        `<div class="status">
+          Login required.
+        </div>`;
+    }
+
+
+    updateAuthButtons(false);
+
 
     return;
   }
 
 
-  /* =========================
-     LOGGED IN
-  ========================= */
-
   currentUser = user;
 
-  updateUserBar();
 
+  showUserStatus(
+    `Logged in as:
+     ${escapeHtml(
+       user.email || "User"
+     )}`
+  );
+
+
+  await loadProfile();
   await loadWallet();
-
   await loadTasks();
-
   await loadSubmissions();
+  await loadWithdrawals();
 
+
+  updateAuthButtons(true);
 }
 
 
 /* =========================
-   USER BAR
+   PROFILE / USERNAME
 ========================= */
 
-async function updateUserBar() {
-
-  const usernameElement =
-    document.getElementById("username");
-
-  const balanceElement =
-    document.getElementById("balance");
-
-  const loginButton =
-    document.getElementById("loginButton");
-
-  const signupButton =
-    document.getElementById("signupButton");
-
-  const logoutButton =
-    document.getElementById("logoutButton");
-
+async function loadProfile() {
 
   if (!currentUser) {
+    return;
+  }
 
-    usernameElement.textContent = "Guest";
 
-    balanceElement.textContent = "0";
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("username")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .maybeSingle();
 
-    loginButton.classList.remove("hidden");
 
-    signupButton.classList.remove("hidden");
+  if (error) {
 
-    logoutButton.classList.add("hidden");
+    console.error(error);
 
     return;
   }
 
 
-  /*
-    Get username from profiles table.
-  */
-
-  let username = null;
-
-
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .select("username, full_name")
-    .eq("id", currentUser.id)
-    .maybeSingle();
+  const usernameElement =
+    document.getElementById(
+      "username"
+    );
 
 
-  if (error) {
-    console.error("Profile error:", error);
+  if (!usernameElement) {
+    return;
   }
 
 
-  if (data) {
+  if (
+    data &&
+    data.username
+  ) {
 
-    username =
-      data.username ||
-      data.full_name ||
-      null;
+    usernameElement.textContent =
+      data.username;
 
+  } else {
+
+    usernameElement.textContent =
+      currentUser.email
+        ? currentUser.email.split("@")[0]
+        : "User";
   }
+}
 
 
-  /*
-    Fallback only if profile username is empty.
-    Email is NOT displayed.
-  */
+/* =========================
+   AUTH BUTTONS
+========================= */
 
-  if (!username) {
+function updateAuthButtons(
+  loggedIn
+) {
 
-    username = "User";
+  const loginButton =
+    document.getElementById(
+      "loginButton"
+    );
 
+  const signupButton =
+    document.getElementById(
+      "signupButton"
+    );
+
+  const logoutButton =
+    document.getElementById(
+      "logoutButton"
+    );
+
+
+  if (loggedIn) {
+
+    if (loginButton) {
+
+      loginButton.classList.add(
+        "hidden"
+      );
+    }
+
+
+    if (signupButton) {
+
+      signupButton.classList.add(
+        "hidden"
+      );
+    }
+
+
+    if (logoutButton) {
+
+      logoutButton.classList.remove(
+        "hidden"
+      );
+    }
+
+  } else {
+
+    if (loginButton) {
+
+      loginButton.classList.remove(
+        "hidden"
+      );
+    }
+
+
+    if (signupButton) {
+
+      signupButton.classList.remove(
+        "hidden"
+      );
+    }
+
+
+    if (logoutButton) {
+
+      logoutButton.classList.add(
+        "hidden"
+      );
+    }
   }
-
-
-  usernameElement.textContent = username;
-
-
-  loginButton.classList.add("hidden");
-
-  signupButton.classList.add("hidden");
-
-  logoutButton.classList.remove("hidden");
-
 }
 
 
@@ -188,25 +281,101 @@ async function updateUserBar() {
 
 async function logoutUser() {
 
-  const { error } =
-    await supabaseClient.auth.signOut();
+  if (!supabaseClient) {
 
-
-  if (error) {
-
-    console.error(error);
-
-    alert(error.message);
+    window.location.href =
+      "login.html";
 
     return;
   }
 
 
-  currentUser = null;
+  const logoutButton =
+    document.getElementById(
+      "logoutButton"
+    );
 
 
-  window.location.reload();
+  if (logoutButton) {
 
+    logoutButton.disabled =
+      true;
+
+    logoutButton.textContent =
+      "Logging out...";
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.signOut();
+
+
+    if (error) {
+
+      console.error(
+        "Logout error:",
+        error
+      );
+
+
+      alert(
+        "Logout failed:\n\n" +
+        error.message
+      );
+
+
+      if (logoutButton) {
+
+        logoutButton.disabled =
+          false;
+
+        logoutButton.textContent =
+          "Logout";
+      }
+
+
+      return;
+    }
+
+
+    /* Clear local state */
+
+    currentUser = null;
+
+
+    /* Go to login */
+
+    window.location.replace(
+      "login.html"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Logout exception:",
+      error
+    );
+
+
+    alert(
+      "Logout failed. Please try again."
+    );
+
+
+    if (logoutButton) {
+
+      logoutButton.disabled =
+        false;
+
+      logoutButton.textContent =
+        "Logout";
+    }
+  }
 }
 
 
@@ -216,44 +385,68 @@ async function logoutUser() {
 
 async function loadWallet() {
 
-  if (!currentUser) return;
-
-
-  const { data, error } =
-    await supabaseClient
-      .from("wallets")
-      .select(
-        "balance, pending_balance, total_earned, total_withdrawn"
-      )
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error("Wallet error:", error);
-
-    document.getElementById("balance").textContent = "0";
-
+  if (!currentUser) {
     return;
   }
 
 
-  if (!data) {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("wallets")
+      .select(`
+        balance,
+        pending_balance,
+        total_earned,
+        total_withdrawn
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .single();
 
-    document.getElementById("balance").textContent = "0";
+
+  if (error) {
+
+    console.error(error);
 
     return;
   }
 
 
   const balance =
-    Number(data.balance || 0);
+    Number(
+      data.balance || 0
+    );
 
 
-  document.getElementById("balance").textContent =
-    balance;
+  const balanceElement =
+    document.getElementById(
+      "balance"
+    );
 
+
+  if (balanceElement) {
+
+    balanceElement.textContent =
+      balance;
+  }
+
+
+  const withdrawBalance =
+    document.getElementById(
+      "withdrawBalance"
+    );
+
+
+  if (withdrawBalance) {
+
+    withdrawBalance.textContent =
+      balance;
+  }
 }
 
 
@@ -264,14 +457,26 @@ async function loadWallet() {
 async function loadTasks() {
 
   const taskList =
-    document.getElementById("taskList");
+    document.getElementById(
+      "taskList"
+    );
+
+
+  if (!taskList) {
+    return;
+  }
 
 
   taskList.innerHTML =
-    `<div class="status">Loading tasks...</div>`;
+    `<div class="status">
+      Loading tasks...
+    </div>`;
 
 
-  const { data, error } =
+  const {
+    data,
+    error
+  } =
     await supabaseClient
       .from("tasks")
       .select(`
@@ -286,10 +491,16 @@ async function loadTasks() {
         current_completions,
         status
       `)
-      .eq("status", "active")
-      .order("created_at", {
-        ascending: false
-      });
+      .eq(
+        "status",
+        "active"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -297,16 +508,23 @@ async function loadTasks() {
     console.error(error);
 
     taskList.innerHTML =
-      `<div class="status">Unable to load tasks.</div>`;
+      `<div class="status">
+        Unable to load tasks.
+      </div>`;
 
     return;
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     taskList.innerHTML =
-      `<div class="status">No tasks available right now.</div>`;
+      `<div class="status">
+        No tasks available right now.
+      </div>`;
 
     return;
   }
@@ -320,32 +538,40 @@ async function loadTasks() {
           ? "Unlimited"
           : Math.max(
               0,
-              Number(task.max_completions) -
-              Number(task.current_completions || 0)
+              Number(
+                task.max_completions
+              ) -
+              Number(
+                task.current_completions ||
+                0
+              )
             );
 
 
       return `
-
         <div class="task-card">
 
           <h3>
-            ${escapeHtml(task.title)}
+            ${escapeHtml(
+              task.title
+            )}
           </h3>
 
-
           <p>
-            ${escapeHtml(task.description || "")}
+            ${escapeHtml(
+              task.description || ""
+            )}
           </p>
-
 
           <p>
             🎁 Reward:
             <span class="reward">
-              ${Number(task.reward)} Coins
+              ${Number(
+                task.reward
+              )}
+              Coins
             </span>
           </p>
-
 
           <p>
             👥 Remaining:
@@ -354,7 +580,6 @@ async function loadTasks() {
 
 
           <button
-            class="start-task"
             onclick="openTask(${Number(task.id)})"
           >
             ▶ Start Task
@@ -363,23 +588,23 @@ async function loadTasks() {
 
           <div
             id="task-${Number(task.id)}"
-            class="task-details hidden"
+            class="hidden"
           >
 
             ${
               task.task_url
                 ? `
                   <p>
-
                     <a
                       class="task-link"
-                      href="${safeUrl(task.task_url)}"
+                      href="${safeUrl(
+                        task.task_url
+                      )}"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       🔗 Open Task
                     </a>
-
                   </p>
                 `
                 : ""
@@ -391,7 +616,6 @@ async function loadTasks() {
                 Instructions:
               </strong>
             </p>
-
 
             <p>
               ${escapeHtml(
@@ -423,11 +647,9 @@ async function loadTasks() {
           </div>
 
         </div>
-
       `;
 
     }).join("");
-
 }
 
 
@@ -437,31 +659,20 @@ async function loadTasks() {
 
 function openTask(taskId) {
 
-  /*
-    Guest can see the task,
-    but must login before opening it.
-  */
-
-  if (!currentUser) {
-
-    window.location.href =
-      "login.html";
-
-    return;
-  }
-
-
   const box =
     document.getElementById(
       `task-${taskId}`
     );
 
 
-  if (!box) return;
+  if (!box) {
+    return;
+  }
 
 
-  box.classList.toggle("hidden");
-
+  box.classList.toggle(
+    "hidden"
+  );
 }
 
 
@@ -469,12 +680,15 @@ function openTask(taskId) {
    SUBMIT TASK
 ========================= */
 
-async function submitTask(taskId) {
+async function submitTask(
+  taskId
+) {
 
   if (!currentUser) {
 
-    window.location.href =
-      "login.html";
+    alert(
+      "Please login first."
+    );
 
     return;
   }
@@ -500,60 +714,78 @@ async function submitTask(taskId) {
 
   if (!proof) {
 
-    resultElement.innerHTML =
-      `<div class="status">
-        Please enter your proof.
-      </div>`;
+    if (resultElement) {
+
+      resultElement.innerHTML =
+        `<div class="status">
+          Please enter your proof.
+        </div>`;
+    }
+
 
     return;
   }
 
 
-  resultElement.innerHTML =
-    `<div class="status">
-      Submitting...
-    </div>`;
+  if (resultElement) {
+
+    resultElement.innerHTML =
+      `<div class="status">
+        Submitting...
+      </div>`;
+  }
 
 
   const {
     data,
     error
-  } = await supabaseClient.rpc(
-    "submit_task",
-    {
-      p_task_id: taskId,
-      p_proof: proof
-    }
-  );
+  } =
+    await supabaseClient.rpc(
+      "submit_task",
+      {
+        p_task_id: taskId,
+        p_proof: proof
+      }
+    );
 
 
   if (error) {
 
     console.error(error);
 
-    resultElement.innerHTML =
-      `<div class="status">
-        ${escapeHtml(error.message)}
-      </div>`;
+
+    if (resultElement) {
+
+      resultElement.innerHTML =
+        `<div class="status">
+          ${escapeHtml(
+            error.message
+          )}
+        </div>`;
+    }
+
 
     return;
   }
 
 
-  resultElement.innerHTML =
-    `<div class="status">
-      ✅ Submitted successfully.
-      Your task is now pending review.
-    </div>`;
+  if (resultElement) {
+
+    resultElement.innerHTML =
+      `<div class="status">
+        ✅ Submitted successfully.
+        Your task is now pending review.
+      </div>`;
+  }
 
 
-  proofElement.value = "";
+  if (proofElement) {
 
+    proofElement.value = "";
+  }
 
-  await loadWallet();
 
   await loadSubmissions();
-
 }
 
 
@@ -563,7 +795,9 @@ async function submitTask(taskId) {
 
 async function loadSubmissions() {
 
-  if (!currentUser) return;
+  if (!currentUser) {
+    return;
+  }
 
 
   const submissionList =
@@ -572,33 +806,39 @@ async function loadSubmissions() {
     );
 
 
+  if (!submissionList) {
+    return;
+  }
+
+
   const {
     data,
     error
-  } = await supabaseClient
-    .from("task_submissions")
-    .select(`
-      id,
-      task_id,
-      reward,
-      status,
-      submitted_at,
-      reviewed_at,
-      review_note,
-      tasks (
-        title
+  } =
+    await supabaseClient
+      .from("task_submissions")
+      .select(`
+        id,
+        task_id,
+        reward,
+        status,
+        submitted_at,
+        reviewed_at,
+        review_note,
+        tasks (
+          title
+        )
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
       )
-    `)
-    .eq(
-      "user_id",
-      currentUser.id
-    )
-    .order(
-      "submitted_at",
-      {
-        ascending: false
-      }
-    );
+      .order(
+        "submitted_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -614,7 +854,10 @@ async function loadSubmissions() {
   }
 
 
-  if (!data || data.length === 0) {
+  if (
+    !data ||
+    data.length === 0
+  ) {
 
     submissionList.innerHTML =
       `<div class="status">
@@ -634,102 +877,444 @@ async function loadSubmissions() {
 
 
       return `
-
         <div class="history-item">
 
           <strong>
             ${escapeHtml(title)}
           </strong>
 
-          <br>
+          <br><br>
 
           Reward:
           <span class="reward">
-            ${Number(item.reward)} Coins
+            ${Number(
+              item.reward
+            )}
+            Coins
           </span>
 
           <br>
 
           Status:
           <strong>
-            ${escapeHtml(item.status)}
+            ${escapeHtml(
+              item.status
+            )}
           </strong>
 
           <br>
 
           Submitted:
-          ${formatDate(item.submitted_at)}
+          ${formatDate(
+            item.submitted_at
+          )}
 
           ${
             item.review_note
               ? `
                 <br>
                 Note:
-                ${escapeHtml(item.review_note)}
+                ${escapeHtml(
+                  item.review_note
+                )}
               `
               : ""
           }
 
         </div>
-
       `;
 
     }).join("");
-
 }
 
 
 /* =========================
-   HELPERS
+   WITHDRAWAL
 ========================= */
 
-function escapeHtml(value) {
+async function requestWithdrawal() {
 
-  return String(value ?? "")
+  if (!currentUser) {
 
+    alert(
+      "Please login first."
+    );
+
+    return;
+  }
+
+
+  const methodElement =
+    document.getElementById(
+      "withdrawMethod"
+    );
+
+
+  const accountElement =
+    document.getElementById(
+      "accountDetails"
+    );
+
+
+  const amountElement =
+    document.getElementById(
+      "withdrawAmount"
+    );
+
+
+  const message =
+    document.getElementById(
+      "withdrawMessage"
+    );
+
+
+  const method =
+    methodElement
+      ? methodElement.value
+      : "";
+
+
+  const accountDetails =
+    accountElement
+      ? accountElement.value.trim()
+      : "";
+
+
+  const amount =
+    amountElement
+      ? Number(
+          amountElement.value
+        )
+      : 0;
+
+
+  if (!method) {
+
+    if (message) {
+
+      message.innerHTML =
+        `<div class="status">
+          Select a payment method.
+        </div>`;
+    }
+
+    return;
+  }
+
+
+  if (!accountDetails) {
+
+    if (message) {
+
+      message.innerHTML =
+        `<div class="status">
+          Enter your payment account.
+        </div>`;
+    }
+
+    return;
+  }
+
+
+  if (
+    !Number.isInteger(amount) ||
+    amount <= 0
+  ) {
+
+    if (message) {
+
+      message.innerHTML =
+        `<div class="status">
+          Enter a valid withdrawal amount.
+        </div>`;
+    }
+
+    return;
+  }
+
+
+  if (message) {
+
+    message.innerHTML =
+      `<div class="status">
+        Processing withdrawal...
+      </div>`;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "request_withdrawal",
+      {
+        p_amount: amount,
+        p_method: method,
+        p_account_details:
+          accountDetails
+      }
+    );
+
+
+  if (error) {
+
+    console.error(error);
+
+
+    if (message) {
+
+      message.innerHTML =
+        `<div class="status">
+          ${escapeHtml(
+            error.message
+          )}
+        </div>`;
+    }
+
+
+    return;
+  }
+
+
+  if (message) {
+
+    message.innerHTML =
+      `<div class="status">
+        ✅ Withdrawal request
+        submitted successfully.
+      </div>`;
+  }
+
+
+  if (amountElement) {
+
+    amountElement.value = "";
+  }
+
+
+  if (accountElement) {
+
+    accountElement.value = "";
+  }
+
+
+  await loadWallet();
+  await loadWithdrawals();
+}
+
+
+/* =========================
+   WITHDRAWAL HISTORY
+========================= */
+
+async function loadWithdrawals() {
+
+  if (!currentUser) {
+    return;
+  }
+
+
+  const list =
+    document.getElementById(
+      "withdrawalList"
+    );
+
+
+  if (!list) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("withdrawals")
+      .select(`
+        id,
+        amount,
+        method,
+        status,
+        requested_at,
+        processed_at,
+        admin_note
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
+      .order(
+        "requested_at",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    list.innerHTML =
+      `<div class="status">
+        Unable to load withdrawals.
+      </div>`;
+
+    return;
+  }
+
+
+  if (
+    !data ||
+    data.length === 0
+  ) {
+
+    list.innerHTML =
+      `<div class="status">
+        No withdrawal requests yet.
+      </div>`;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    data.map(item => {
+
+      return `
+        <div class="status">
+
+          💸
+          ${Number(
+            item.amount
+          )}
+          Coins
+
+          <br><br>
+
+          Method:
+          ${escapeHtml(
+            item.method
+          )}
+
+          <br>
+
+          Status:
+          <strong>
+            ${escapeHtml(
+              item.status
+            )}
+          </strong>
+
+          <br>
+
+          Requested:
+          ${formatDate(
+            item.requested_at
+          )}
+
+          ${
+            item.admin_note
+              ? `
+                <br>
+                Admin note:
+                ${escapeHtml(
+                  item.admin_note
+                )}
+              `
+              : ""
+          }
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================
+   USER STATUS
+========================= */
+
+function showUserStatus(
+  message
+) {
+
+  const element =
+    document.getElementById(
+      "userStatus"
+    );
+
+
+  if (element) {
+
+    element.innerHTML =
+      message;
+  }
+}
+
+
+/* =========================
+   HTML ESCAPE
+========================= */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
     .replace(
       /&/g,
       "&amp;"
     )
-
     .replace(
       /</g,
       "&lt;"
     )
-
     .replace(
       />/g,
       "&gt;"
     )
-
     .replace(
       /"/g,
       "&quot;"
     )
-
     .replace(
       /'/g,
       "&#039;"
     );
-
 }
 
 
-function safeUrl(value) {
+/* =========================
+   SAFE URL
+========================= */
+
+function safeUrl(
+  value
+) {
 
   try {
 
     const url =
-      new URL(value);
+      new URL(
+        value,
+        window.location.href
+      );
 
 
     if (
-      url.protocol === "https:" ||
-      url.protocol === "http:"
+      url.protocol ===
+        "https:" ||
+      url.protocol ===
+        "http:"
     ) {
 
       return url.href;
-
     }
 
 
@@ -738,18 +1323,37 @@ function safeUrl(value) {
   } catch {
 
     return "#";
-
   }
-
 }
 
 
-function formatDate(value) {
+/* =========================
+   DATE FORMAT
+========================= */
 
-  if (!value) return "";
+function formatDate(
+  value
+) {
 
-  return new Date(value)
-    .toLocaleString();
+  if (!value) {
+    return "";
+  }
 
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return "";
+  }
+
+
+  return date.toLocaleString();
 }
 ```
