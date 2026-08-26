@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sign Up - Micro Tasks</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .auth-container {
+      max-width: 420px;
+      margin: 50px auto;
+      padding: 25px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.10);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .signup-btn {
+      background: #222;
+      color: white;
+    }
+
+    .login-btn {
+      background: #eee;
+      color: #222;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .back {
+      display: block;
+      margin-top: 20px;
+      text-align: center;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="auth-container">
+
+    <h1>📝 Create Account</h1>
+
+    <input
+      type="text"
+      id="username"
+      placeholder="Username"
+      autocomplete="username"
+      maxlength="30"
+    >
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Email"
+      autocomplete="email"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+      autocomplete="new-password"
+    >
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Confirm Password"
+      autocomplete="new-password"
+    >
+
+    <button
+      class="signup-btn"
+      onclick="registerUser()"
+    >
+      Create Account
+    </button>
+
+    <button
+      class="login-btn"
+      onclick="location.href='login.html'"
+    >
+      Already have an account? Login
+    </button>
+
+    <div
+      class="message"
+      id="message"
+    ></div>
+
+    <a
+      class="back"
+      href="tasks.html"
+    >
+      ← Back to Micro Tasks
+    </a>
+
+  </div>
+
+
+<script>
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+
+async function registerUser() {
+
+  const username =
+    document.getElementById("username").value.trim();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const confirmPassword =
+    document.getElementById("confirmPassword").value;
+
+  const message =
+    document.getElementById("message");
+
+
+  if (!username || !email || !password || !confirmPassword) {
+
+    message.textContent =
+      "Please fill in all fields.";
+
+    return;
+  }
+
+
+  if (username.length < 3) {
+
+    message.textContent =
+      "Username must be at least 3 characters.";
+
+    return;
+  }
+
+
+  if (password.length < 6) {
+
+    message.textContent =
+      "Password must be at least 6 characters.";
+
+    return;
+  }
+
+
+  if (password !== confirmPassword) {
+
+    message.textContent =
+      "Passwords do not match.";
+
+    return;
+  }
+
+
+  message.textContent =
+    "Creating account...";
+
+
+  const { data, error } =
+    await supabaseClient.auth.signUp({
+
+      email: email,
+
+      password: password,
+
+      options: {
+        data: {
+          username: username
+        }
+      }
+
+    });
+
+
+  if (error) {
+
+    console.error(error);
+
+    message.textContent =
+      error.message;
+
+    return;
+  }
+
+
+  /*
+   * Depending on Supabase email-confirmation
+   * settings, session may or may not be returned.
+   */
+
+  if (data.session) {
+
+    message.textContent =
+      "Account created successfully!";
+
+    setTimeout(() => {
+
+      window.location.href =
+        "tasks.html";
+
+    }, 700);
+
+  } else {
+
+    message.textContent =
+      "Account created. Please check your email to confirm your account.";
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
