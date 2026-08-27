@@ -1,267 +1,290 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Admin Panel - LSR</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
+  <title>Admin Panel</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #0d0d0d;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    header {
-      background: #191919;
-      border-bottom: 1px solid #333;
-      padding: 22px 15px;
-      text-align: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 30px;
-    }
-
-    header p {
-      color: #aaa;
-      margin-bottom: 0;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      background: #191919;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-
-    .admin-name {
-      font-weight: bold;
-    }
-
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .refresh {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .logout {
-      background: #555;
-      color: #fff;
-    }
-
-    .section {
-      background: #191919;
-      border: 1px solid #333;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 20px;
-    }
-
-    .section h2 {
-      margin-top: 0;
-    }
-
-    .status {
-      background: #242424;
-      border-radius: 9px;
-      padding: 14px;
-      margin: 10px 0;
-      color: #ddd;
-    }
-
-    .submission,
-    .withdrawal,
-    .task {
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 12px 0;
-    }
-
-    .submission h3,
-    .withdrawal h3,
-    .task h3 {
-      margin-top: 0;
-    }
-
-    .proof {
-      background: #1d1d1d;
-      border-radius: 8px;
-      padding: 12px;
-      margin: 10px 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .approve {
-      background: #16a34a;
-      color: white;
-      margin-right: 6px;
-    }
-
-    .reject {
-      background: #dc2626;
-      color: white;
-    }
-
-    .inactive {
-      color: #f87171;
-    }
-
-    .active {
-      color: #4ade80;
-    }
 
     .hidden {
       display: none !important;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 12px;
-      }
-
-      .topbar {
-        align-items: stretch;
-      }
-
-      .topbar button {
-        width: 100%;
-      }
+    .admin-container {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 20px;
     }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .admin-section {
+      margin-bottom: 30px;
+    }
+
+    .admin-section h2 {
+      margin-bottom: 15px;
+    }
+
+    .task-admin-form,
+    .task-admin-card,
+    .submission,
+    .withdrawal {
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #ddd;
+    }
+
+    .task-admin-form input,
+    .task-admin-form textarea,
+    .task-admin-form select,
+    .task-admin-card input,
+    .task-admin-card textarea,
+    .task-admin-card select {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 7px 0;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .task-admin-form textarea,
+    .task-admin-card textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .task-admin-card button,
+    .task-admin-form button,
+    .submission button,
+    .withdrawal button {
+      margin: 5px 5px 5px 0;
+    }
+
+    .approve {
+      background: #198754;
+      color: white;
+    }
+
+    .reject {
+      background: #dc3545;
+      color: white;
+    }
+
+    .admin-logout {
+      background: #dc3545;
+      color: white;
+    }
+
+    .status {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 7px;
+      background: #f5f5f5;
+    }
+
+    .proof {
+      padding: 15px;
+      margin: 15px 0;
+      background: #f7f7f7;
+      border-radius: 7px;
+      word-break: break-word;
+    }
+
+    hr {
+      margin: 25px 0;
+      border: 0;
+      border-top: 1px solid #ddd;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
-<header>
-  <h1>🛠️ LSR Admin Panel</h1>
-  <p>Manage Micro Tasks & Withdrawals</p>
-</header>
 
-<div class="container">
+  <!-- =========================
+       ACCESS CHECK
+  ========================= -->
 
-  <div id="accessStatus" class="status">
+  <div
+    id="accessStatus"
+    class="status"
+    style="max-width:700px;margin:50px auto;text-align:center;"
+  >
+
     Checking admin access...
+
   </div>
 
-  <div id="adminPanel" class="hidden">
 
-    <div class="topbar">
+
+  <!-- =========================
+       ADMIN PANEL
+  ========================= -->
+
+  <main
+    id="adminPanel"
+    class="admin-container hidden"
+  >
+
+
+    <!-- HEADER -->
+
+    <div class="admin-header">
 
       <div>
-        👤 Admin:
-        <span id="adminName" class="admin-name">
-          Admin
-        </span>
+
+        <h1>
+          Admin Panel
+        </h1>
+
+        <p>
+          Welcome,
+          <strong id="adminName">
+            Admin
+          </strong>
+        </p>
+
       </div>
 
-      <div>
-        <button
-          class="refresh"
-          onclick="loadAdminData()"
-        >
-          🔄 Refresh
-        </button>
 
-        <button
-          class="logout"
-          onclick="adminLogout()"
-        >
-          Logout
-        </button>
-      </div>
+      <button
+        type="button"
+        class="admin-logout"
+        onclick="adminLogout()"
+      >
+        🚪 Logout
+      </button>
 
     </div>
+
 
 
     <!-- =========================
-         TASK SUBMISSIONS
-    ========================== -->
+         TASK MANAGEMENT
+    ========================= -->
 
-    <div class="section">
+    <section class="admin-section">
 
-      <h2>📥 Pending Task Submissions</h2>
+      <h2>
+        📝 Task Management
+      </h2>
 
-      <div id="submissionList">
+      <div
+        id="taskList"
+      >
+
+        <div class="status">
+          Loading tasks...
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         SUBMISSIONS
+    ========================= -->
+
+    <section class="admin-section">
+
+      <h2>
+        📋 Pending Task Submissions
+      </h2>
+
+      <div
+        id="submissionList"
+      >
+
         <div class="status">
           Loading submissions...
         </div>
+
       </div>
 
-    </div>
+    </section>
+
 
 
     <!-- =========================
          WITHDRAWALS
-    ========================== -->
+    ========================= -->
 
-    <div class="section">
+    <section class="admin-section">
 
-      <h2>💸 Withdrawal Requests</h2>
+      <h2>
+        💸 Pending Withdrawals
+      </h2>
 
-      <div id="withdrawalList">
+      <div
+        id="withdrawalList"
+      >
+
         <div class="status">
           Loading withdrawals...
         </div>
+
       </div>
 
-    </div>
+    </section>
 
 
-    <!-- =========================
-         TASKS
-    ========================== -->
+  </main>
 
-    <div class="section">
 
-      <h2>📋 Tasks</h2>
 
-      <div id="taskList">
-        <div class="status">
-          Loading tasks...
-        </div>
-      </div>
+  <!-- =========================
+       SUPABASE
+  ========================= -->
 
-    </div>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
-  </div>
 
-</div>
+  <!-- =========================
+       CONFIG
+  ========================= -->
 
-<script src="admin.js"></script>
+  <script src="config.js"></script>
+
+
+  <!-- =========================
+       ADMIN JS
+  ========================= -->
+
+  <script src="admin.js"></script>
+
 
 </body>
+
 </html>
