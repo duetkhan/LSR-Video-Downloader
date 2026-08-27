@@ -1,19 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Micro Tasks - LSR</title>
 
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="supabase-config.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
+
 
     body {
       margin: 0;
@@ -22,9 +33,15 @@
       font-family: Arial, sans-serif;
     }
 
+
     a {
       color: inherit;
     }
+
+
+    /* =========================
+       HEADER
+    ========================= */
 
     header {
       padding: 25px 15px;
@@ -33,15 +50,18 @@
       border-bottom: 1px solid #333;
     }
 
+
     header h1 {
       margin: 0;
       font-size: 34px;
     }
 
+
     header p {
       margin: 8px 0 0;
       color: #ccc;
     }
+
 
     /* =========================
        USER BAR
@@ -63,6 +83,7 @@
       border: 1px solid #333;
     }
 
+
     .user-left {
       display: flex;
       align-items: center;
@@ -71,6 +92,7 @@
       min-width: 0;
       flex: 1;
     }
+
 
     .username {
       font-weight: bold;
@@ -81,6 +103,7 @@
       white-space: nowrap;
     }
 
+
     .user-right {
       display: flex;
       align-items: center;
@@ -90,11 +113,13 @@
       flex-wrap: wrap;
     }
 
+
     .balance {
       color: #ffd43b;
       font-weight: bold;
       white-space: nowrap;
     }
+
 
     /* =========================
        BUTTONS
@@ -116,20 +141,24 @@
       font-size: 14px;
     }
 
+
     .login-btn {
       background: #2563eb;
       color: #fff;
     }
+
 
     .signup-btn {
       background: #16a34a;
       color: #fff;
     }
 
+
     .logout-btn {
       background: #555;
       color: #fff;
     }
+
 
     .withdraw-btn {
       background: #f59e0b;
@@ -138,9 +167,6 @@
       font-weight: bold;
     }
 
-    .hidden {
-      display: none !important;
-    }
 
     /* =========================
        MAIN
@@ -154,11 +180,13 @@
       padding: 10px 18px 40px;
     }
 
+
     .hero {
       text-align: center;
 
       padding: 20px 10px;
     }
+
 
     .hero h2 {
       font-size: 32px;
@@ -166,11 +194,13 @@
       margin: 5px 0;
     }
 
+
     .hero p {
       color: #ccc;
 
       margin: 5px 0;
     }
+
 
     /* =========================
        STATUS
@@ -188,6 +218,7 @@
       color: #eee;
     }
 
+
     /* =========================
        TASKS
     ========================= */
@@ -197,6 +228,7 @@
 
       font-size: 27px;
     }
+
 
     .task-card {
       background: #1b1b1b;
@@ -210,11 +242,13 @@
       margin: 15px 0;
     }
 
+
     .task-card h3 {
       margin-top: 0;
 
       font-size: 22px;
     }
+
 
     .task-card p {
       color: #ddd;
@@ -222,11 +256,13 @@
       line-height: 1.5;
     }
 
+
     .reward {
       color: #ffd43b;
 
       font-weight: bold;
     }
+
 
     .start-task {
       background: #2563eb;
@@ -236,6 +272,7 @@
       font-weight: bold;
     }
 
+
     .submit-task {
       background: #16a34a;
 
@@ -244,6 +281,7 @@
       font-weight: bold;
     }
 
+
     .task-details {
       margin-top: 18px;
 
@@ -251,6 +289,7 @@
 
       border-top: 1px solid #333;
     }
+
 
     .task-details textarea {
       width: 100%;
@@ -272,6 +311,7 @@
       margin: 10px 0;
     }
 
+
     .task-link {
       display: inline-block;
 
@@ -288,6 +328,12 @@
       margin: 8px 0;
     }
 
+
+    .hidden {
+      display: none !important;
+    }
+
+
     /* =========================
        HISTORY
     ========================= */
@@ -303,6 +349,7 @@
 
       margin: 10px 0;
     }
+
 
     /* =========================
        ADS
@@ -322,6 +369,7 @@
       overflow: hidden;
     }
 
+
     /* =========================
        FOOTER
     ========================= */
@@ -338,6 +386,7 @@
       margin-top: 30px;
     }
 
+
     /* =========================
        MOBILE
     ========================= */
@@ -348,60 +397,88 @@
         font-size: 27px;
       }
 
+
       .user-bar {
         align-items: center;
+
         padding: 12px;
       }
+
 
       .user-left {
         min-width: 0;
       }
 
+
       .user-right {
         flex-shrink: 0;
+
         justify-content: flex-end;
       }
+
 
       .user-right button,
       .user-right a {
         text-align: center;
       }
 
+
+      .balance {
+        width: 100%;
+
+        text-align: right;
+
+        margin-bottom: 3px;
+      }
+
+
       .hero h2 {
         font-size: 27px;
       }
+
     }
+
 
     @media (max-width: 430px) {
 
       .user-bar {
         flex-direction: row;
+
         align-items: flex-start;
       }
+
 
       .user-left {
         padding-top: 8px;
       }
 
+
       .user-right {
         flex-direction: column;
+
         align-items: stretch;
       }
 
+
       .balance {
-        text-align: right;
+        text-align: center;
       }
+
 
       .user-right button,
       .user-right a {
         width: 100%;
       }
+
     }
 
   </style>
+
 </head>
 
+
 <body>
+
 
 <!-- =========================
      HEADER
@@ -420,13 +497,13 @@
 </header>
 
 
+
 <!-- =========================
      USER BAR
 ========================= -->
 
 <div class="user-bar">
 
-  <!-- LEFT: USERNAME -->
 
   <div class="user-left">
 
@@ -444,9 +521,9 @@
   </div>
 
 
-  <!-- RIGHT: BALANCE + BUTTONS -->
 
   <div class="user-right">
+
 
     <span class="balance">
 
@@ -461,8 +538,6 @@
     </span>
 
 
-    <!-- LOGIN -->
-
     <a
       href="login.html"
       id="loginButton"
@@ -471,8 +546,6 @@
       Login
     </a>
 
-
-    <!-- SIGN UP -->
 
     <a
       href="signup.html"
@@ -483,18 +556,17 @@
     </a>
 
 
-    <!-- LOGOUT -->
+    <!-- CORRECTED LOGOUT BUTTON -->
 
     <button
       id="logoutButton"
       class="logout-btn hidden"
       type="button"
+      onclick="logoutUser()"
     >
       Logout
     </button>
 
-
-    <!-- WITHDRAW -->
 
     <a
       href="withdraw.html"
@@ -508,6 +580,7 @@
 </div>
 
 
+
 <!-- =========================
      TOP AD
 ========================= -->
@@ -515,18 +588,33 @@
 <div class="ad-box">
 
   <script>
+
     atOptions = {
-      'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-      'format': 'iframe',
-      'height': 50,
-      'width': 320,
-      'params': {}
+
+      'key':
+        '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+
+      'format':
+        'iframe',
+
+      'height':
+        50,
+
+      'width':
+        320,
+
+      'params':
+        {}
+
     };
+
   </script>
+
 
   <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
 
 </div>
+
 
 
 <!-- =========================
@@ -534,6 +622,7 @@
 ========================= -->
 
 <div class="container">
+
 
   <div class="hero">
 
@@ -548,13 +637,11 @@
   </div>
 
 
-  <!-- =========================
-       TASK LIST
-  ========================= -->
 
   <h2 class="section-title">
     📋 Tasks
   </h2>
+
 
   <div id="taskList">
 
@@ -565,13 +652,11 @@
   </div>
 
 
-  <!-- =========================
-       TASK HISTORY
-  ========================= -->
 
   <h2 class="section-title">
     📌 My Task History
   </h2>
+
 
   <div id="submissionList">
 
@@ -581,7 +666,9 @@
 
   </div>
 
+
 </div>
+
 
 
 <!-- =========================
@@ -591,18 +678,33 @@
 <div class="ad-box">
 
   <script>
+
     atOptions = {
-      'key': '3f673e5d02626eb857acc774c36f56a6',
-      'format': 'iframe',
-      'height': 60,
-      'width': 468,
-      'params': {}
+
+      'key':
+        '3f673e5d02626eb857acc774c36f56a6',
+
+      'format':
+        'iframe',
+
+      'height':
+        60,
+
+      'width':
+        468,
+
+      'params':
+        {}
+
     };
+
   </script>
+
 
   <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
 
 </div>
+
 
 
 <!-- =========================
@@ -611,299 +713,21 @@
 
 <footer>
 
-  © 2026 LSR Earning Point = developed by- (Bulbul Ahmed Riyan)
+  © 2026 LSR Earning Point =
+  developed by- (Bulbul Ahmed Riyan)
 
 </footer>
 
 
-<!-- =========================
-     AUTH UI SCRIPT
-     This only controls
-     username / balance /
-     login / signup / logout
-========================= -->
-
-<script>
-
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
-
-
-const usernameElement =
-  document.getElementById("username");
-
-const balanceElement =
-  document.getElementById("balance");
-
-const loginButton =
-  document.getElementById("loginButton");
-
-const signupButton =
-  document.getElementById("signupButton");
-
-const logoutButton =
-  document.getElementById("logoutButton");
-
-
-/* =========================
-   GUEST UI
-========================= */
-
-function showGuest() {
-
-  usernameElement.textContent = "Guest";
-
-  balanceElement.textContent = "0";
-
-  loginButton.classList.remove("hidden");
-
-  signupButton.classList.remove("hidden");
-
-  logoutButton.classList.add("hidden");
-}
-
-
-/* =========================
-   LOGGED-IN UI
-========================= */
-
-async function showLoggedIn(user) {
-
-  loginButton.classList.add("hidden");
-
-  signupButton.classList.add("hidden");
-
-  logoutButton.classList.remove("hidden");
-
-
-  /*
-    Get profile using auth user ID
-  */
-
-  const { data: profile, error } =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "Profile error:",
-      error
-    );
-
-    /*
-      Even if profile loading fails,
-      don't show Guest after login.
-    */
-
-    usernameElement.textContent =
-      user.email
-        ? user.email.split("@")[0]
-        : "User";
-
-    balanceElement.textContent = "0";
-
-    return;
-  }
-
-
-  if (profile) {
-
-    /*
-      Username
-    */
-
-    usernameElement.textContent =
-      profile.username ||
-      profile.full_name ||
-      (
-        user.email
-          ? user.email.split("@")[0]
-          : "User"
-      );
-
-
-    /*
-      Balance
-
-      Supports common column names
-      without changing your database.
-    */
-
-    let userBalance = 0;
-
-
-    if (
-      profile.balance !== undefined &&
-      profile.balance !== null
-    ) {
-
-      userBalance = profile.balance;
-
-    }
-
-    else if (
-      profile.coins !== undefined &&
-      profile.coins !== null
-    ) {
-
-      userBalance = profile.coins;
-
-    }
-
-    else if (
-      profile.points !== undefined &&
-      profile.points !== null
-    ) {
-
-      userBalance = profile.points;
-
-    }
-
-
-    balanceElement.textContent =
-      Number(userBalance) || 0;
-
-  }
-
-  else {
-
-    usernameElement.textContent =
-      user.email
-        ? user.email.split("@")[0]
-        : "User";
-
-    balanceElement.textContent = "0";
-
-  }
-
-}
-
-
-/* =========================
-   CHECK LOGIN
-========================= */
-
-async function checkLogin() {
-
-  const {
-    data: {
-      user
-    }
-  } = await supabaseClient.auth.getUser();
-
-
-  if (user) {
-
-    await showLoggedIn(user);
-
-  }
-
-  else {
-
-    showGuest();
-
-  }
-
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-async function logoutUser() {
-
-  logoutButton.disabled = true;
-
-  logoutButton.textContent =
-    "Logging out...";
-
-
-  const {
-    error
-  } =
-    await supabaseClient.auth.signOut();
-
-
-  if (error) {
-
-    console.error(error);
-
-    alert(
-      "Logout failed: " +
-      error.message
-    );
-
-    logoutButton.disabled = false;
-
-    logoutButton.textContent =
-      "Logout";
-
-    return;
-  }
-
-
-  showGuest();
-
-  logoutButton.disabled = false;
-
-  logoutButton.textContent =
-    "Logout";
-
-}
-
-
-/* =========================
-   AUTH STATE LISTENER
-========================= */
-
-supabaseClient.auth.onAuthStateChange(
-  async (event, session) => {
-
-    if (
-      session &&
-      session.user
-    ) {
-
-      await showLoggedIn(
-        session.user
-      );
-
-    }
-
-    else {
-
-      showGuest();
-
-    }
-
-  }
-);
-
-
-/* =========================
-   START
-========================= */
-
-checkLogin();
-
-</script>
-
 
 <!-- =========================
-     YOUR EXISTING TASK JS
-     KEEP THIS
+     JAVASCRIPT
 ========================= -->
 
 <script src="tasks.js"></script>
 
 
 </body>
+
 </html>
+```
