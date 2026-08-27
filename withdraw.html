@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -8,6 +9,7 @@
   <title>Withdraw - LSR</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="supabase-config.js"></script>
 
   <style>
@@ -129,8 +131,8 @@
       display: none !important;
     }
   </style>
-</head>
 
+</head>
 
 <body>
 
@@ -144,47 +146,47 @@
 
 </header>
 
-
 <div class="container">
-
 
   <!-- TOP AD -->
 
   <div class="ad-box">
 
-    <script>
-      atOptions = {
-        'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
-        'format': 'iframe',
-        'height': 50,
-        'width': 320,
-        'params': {}
-      };
-    </script>
+```
+<script>
+  atOptions = {
+    'key': '2a7ac0b46ca2d6ecef70fb7f768ae8cf',
+    'format': 'iframe',
+    'height': 50,
+    'width': 320,
+    'params': {}
+  };
+</script>
 
-    <script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+<script src="https://www.highperformanceformat.com/2a7ac0b46ca2d6ecef70fb7f768ae8cf/invoke.js"></script>
+```
 
   </div>
-
 
   <!-- BALANCE -->
 
   <div class="card">
 
-    <h2>🪙 Available Balance</h2>
+```
+<h2>🪙 Available Balance</h2>
 
-    <div class="balance">
+<div class="balance">
 
-      <span id="balance">
-        0
-      </span>
+  <span id="balance">
+    0
+  </span>
 
-      Coins
+  Coins
 
-    </div>
+</div>
+```
 
   </div>
-
 
   <!-- WITHDRAW FORM -->
 
@@ -193,76 +195,82 @@
     id="withdrawCard"
   >
 
-    <h2>💸 Request Withdrawal</h2>
+```
+<h2>💸 Request Withdrawal</h2>
 
 
-    <label for="withdrawAmount">
-      Amount (Coins)
-    </label>
 
-    <input
-      type="number"
-      id="withdrawAmount"
-      min="1"
-      step="1"
-      placeholder="Enter amount"
-    >
+<label for="withdrawAmount">
+  Amount (Coins)
+</label>
 
-
-    <label for="withdrawMethod">
-      Payment Method
-    </label>
-
-    <select id="withdrawMethod">
-
-      <option value="">
-        Select payment method
-      </option>
-
-      <option value="bKash">
-        bKash
-      </option>
-
-      <option value="Nagad">
-        Nagad
-      </option>
-
-      <option value="PayPal">
-        PayPal
-      </option>
-
-      <option value="Binance">
-        Binance
-      </option>
-
-    </select>
+<input
+  type="number"
+  id="withdrawAmount"
+  min="110"
+  step="1"
+  placeholder="Minimum 110 Coins"
+>
 
 
-    <label for="accountDetails">
-      Payment Account
-    </label>
 
-    <input
-      type="text"
-      id="accountDetails"
-      placeholder="Enter number / email / wallet"
-    >
+<label for="withdrawMethod">
+  Payment Method
+</label>
+
+<select id="withdrawMethod">
+
+  <option value="">
+    Select payment method
+  </option>
+
+  <option value="bKash">
+    bKash
+  </option>
+
+  <option value="Nagad">
+    Nagad
+  </option>
+
+  <option value="PayPal">
+    PayPal
+  </option>
+
+  <option value="Binance">
+    Binance
+  </option>
+
+</select>
 
 
-    <button
-      class="submit-btn"
-      onclick="requestWithdrawal()"
-    >
-      Submit Withdrawal
-    </button>
+
+<label for="accountDetails">
+  Payment Account
+</label>
+
+<input
+  type="text"
+  id="accountDetails"
+  placeholder="Enter number / email / wallet"
+>
 
 
-    <div
-      id="withdrawMessage"
-    ></div>
+
+<button
+  class="submit-btn"
+  onclick="requestWithdrawal()"
+>
+  Submit Withdrawal
+</button>
+
+
+
+<div
+  id="withdrawMessage"
+></div>
+```
 
   </div>
-
 
   <!-- LOGIN MESSAGE -->
 
@@ -273,57 +281,63 @@
     Please login to request a withdrawal.
   </div>
 
-
   <!-- HISTORY -->
 
   <div class="card">
 
-    <h2>📋 Withdrawal History</h2>
+```
+<h2>📋 Withdrawal History</h2>
 
-    <div id="withdrawalList">
+<div id="withdrawalList">
 
-      <div class="status">
-        Login to view withdrawal history.
-      </div>
+  <div class="status">
+    Login to view withdrawal history.
+  </div>
 
-    </div>
+</div>
+```
 
   </div>
 
+<a
+href="tasks.html"
+class="back-btn"
 
-  <a
-    href="tasks.html"
-    class="back-btn"
-  >
-    ← Back to Micro Tasks
+>
+
+```
+← Back to Micro Tasks
+```
+
   </a>
-
 
   <!-- BOTTOM AD -->
 
   <div class="ad-box">
 
-    <script>
-      atOptions = {
-        'key': '3f673e5d02626eb857acc774c36f56a6',
-        'format': 'iframe',
-        'height': 60,
-        'width': 468,
-        'params': {}
-      };
-    </script>
+```
+<script>
+  atOptions = {
+    'key': '3f673e5d02626eb857acc774c36f56a6',
+    'format': 'iframe',
+    'height': 60,
+    'width': 468,
+    'params': {}
+  };
+</script>
 
-    <script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+<script src="https://www.highperformanceformat.com/3f673e5d02626eb857acc774c36f56a6/invoke.js"></script>
+```
 
   </div>
 
 </div>
 
-
 <script>
 
 let supabaseClient = null;
 let currentUser = null;
+
 
 
 /* =========================
@@ -341,12 +355,14 @@ document.addEventListener(
       );
 
 
+
     const {
       data: {
         session
       }
     } =
       await supabaseClient.auth.getSession();
+
 
 
     if (
@@ -370,6 +386,7 @@ document.addEventListener(
 );
 
 
+
 /* =========================
    LOGGED OUT
 ========================= */
@@ -381,11 +398,13 @@ function showLoggedOut() {
     .classList.add("hidden");
 
 
+
   document
     .getElementById("loginMessage")
     .classList.remove("hidden");
 
 }
+
 
 
 /* =========================
@@ -395,6 +414,7 @@ function showLoggedOut() {
 async function loadWallet() {
 
   if (!currentUser) return;
+
 
 
   const {
@@ -413,6 +433,7 @@ async function loadWallet() {
       .maybeSingle();
 
 
+
   if (error) {
 
     console.error(error);
@@ -420,6 +441,7 @@ async function loadWallet() {
     return;
 
   }
+
 
 
   document
@@ -430,6 +452,7 @@ async function loadWallet() {
       );
 
 }
+
 
 
 /* =========================
@@ -448,6 +471,7 @@ async function requestWithdrawal() {
   }
 
 
+
   const amount =
     Number(
       document
@@ -458,12 +482,14 @@ async function requestWithdrawal() {
     );
 
 
+
   const method =
     document
       .getElementById(
         "withdrawMethod"
       )
       .value;
+
 
 
   const accountDetails =
@@ -475,11 +501,13 @@ async function requestWithdrawal() {
       .trim();
 
 
+
   const message =
     document
       .getElementById(
         "withdrawMessage"
       );
+
 
 
   if (
@@ -497,6 +525,24 @@ async function requestWithdrawal() {
   }
 
 
+
+  /* =========================
+     MINIMUM WITHDRAWAL
+  ========================= */
+
+  if (amount < 110) {
+
+    message.innerHTML =
+      `<div class="status">
+        Minimum withdrawal amount is 110 Coins.
+      </div>`;
+
+    return;
+
+  }
+
+
+
   if (!method) {
 
     message.innerHTML =
@@ -507,6 +553,7 @@ async function requestWithdrawal() {
     return;
 
   }
+
 
 
   if (!accountDetails) {
@@ -521,10 +568,12 @@ async function requestWithdrawal() {
   }
 
 
+
   message.innerHTML =
     `<div class="status">
       Processing...
     </div>`;
+
 
 
   const {
@@ -540,6 +589,7 @@ async function requestWithdrawal() {
           accountDetails
       }
     );
+
 
 
   if (error) {
@@ -558,10 +608,12 @@ async function requestWithdrawal() {
   }
 
 
+
   message.innerHTML =
     `<div class="status">
       ✅ Withdrawal request submitted successfully.
     </div>`;
+
 
 
   document
@@ -571,6 +623,7 @@ async function requestWithdrawal() {
     .value = "";
 
 
+
   document
     .getElementById(
       "accountDetails"
@@ -578,10 +631,12 @@ async function requestWithdrawal() {
     .value = "";
 
 
+
   await loadWallet();
   await loadWithdrawals();
 
 }
+
 
 
 /* =========================
@@ -593,10 +648,12 @@ async function loadWithdrawals() {
   if (!currentUser) return;
 
 
+
   const list =
     document.getElementById(
       "withdrawalList"
     );
+
 
 
   const {
@@ -626,6 +683,7 @@ async function loadWithdrawals() {
       );
 
 
+
   if (error) {
 
     console.error(error);
@@ -638,6 +696,7 @@ async function loadWithdrawals() {
     return;
 
   }
+
 
 
   if (
@@ -653,6 +712,7 @@ async function loadWithdrawals() {
     return;
 
   }
+
 
 
   list.innerHTML =
@@ -684,8 +744,7 @@ async function loadWithdrawals() {
             <strong>
               ${escapeHtml(
                 item.status
-              )}
-            </strong>
+              )}</strong>
 
             <br>
 
@@ -714,6 +773,7 @@ async function loadWithdrawals() {
     ).join("");
 
 }
+
 
 
 /* =========================
@@ -747,6 +807,7 @@ function escapeHtml(value) {
     );
 
 }
+
 
 
 function formatDate(value) {
