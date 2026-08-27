@@ -1,24 +1,39 @@
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Login - Micro Tasks</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
   <script src="supabase-config.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
+
 
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f5f5;
     }
+
 
     .auth-container {
       max-width: 420px;
@@ -29,10 +44,12 @@
       box-shadow: 0 4px 20px rgba(0,0,0,.10);
     }
 
+
     h1 {
       text-align: center;
       margin-bottom: 25px;
     }
+
 
     input {
       width: 100%;
@@ -42,6 +59,7 @@
       border-radius: 8px;
       font-size: 15px;
     }
+
 
     button {
       width: 100%;
@@ -53,21 +71,32 @@
       font-size: 15px;
     }
 
+
     .login-btn {
       background: #222;
       color: white;
     }
+
 
     .signup-btn {
       background: #eee;
       color: #222;
     }
 
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+
     .message {
       margin-top: 15px;
       text-align: center;
       font-size: 14px;
+      min-height: 20px;
     }
+
 
     .back {
       display: block;
@@ -75,14 +104,22 @@
       text-align: center;
       text-decoration: none;
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
   <div class="auth-container">
 
-    <h1>🔐 Login</h1>
+
+    <h1>
+      🔐 Login
+    </h1>
+
 
     <input
       type="email"
@@ -91,6 +128,7 @@
       autocomplete="email"
     >
 
+
     <input
       type="password"
       id="password"
@@ -98,12 +136,15 @@
       autocomplete="current-password"
     >
 
+
     <button
+      id="loginButton"
       class="login-btn"
       onclick="loginUser()"
     >
       Login
     </button>
+
 
     <button
       class="signup-btn"
@@ -112,10 +153,12 @@
       Create Account
     </button>
 
+
     <div
       class="message"
       id="message"
     ></div>
+
 
     <a
       class="back"
@@ -124,27 +167,56 @@
       ← Back to Micro Tasks
     </a>
 
+
   </div>
+
 
 
 <script>
 
-const supabaseClient = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
 
+/* =========================
+   SUPABASE
+========================= */
+
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+
+/* =========================
+   LOGIN
+========================= */
 
 async function loginUser() {
 
+
   const email =
-    document.getElementById("email").value.trim();
+    document
+      .getElementById("email")
+      .value
+      .trim();
+
 
   const password =
-    document.getElementById("password").value;
+    document
+      .getElementById("password")
+      .value;
+
 
   const message =
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
+
+
+  const loginButton =
+    document.getElementById(
+      "loginButton"
+    );
 
 
   if (!email || !password) {
@@ -156,41 +228,209 @@ async function loginUser() {
   }
 
 
-  message.textContent =
+  loginButton.disabled =
+    true;
+
+
+  loginButton.textContent =
     "Logging in...";
 
 
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
+  message.textContent =
+    "";
 
 
-  if (error) {
 
-    console.error(error);
+  try {
+
+
+    /* =========================
+       SUPABASE LOGIN
+    ========================= */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth
+        .signInWithPassword({
+
+          email: email,
+
+          password: password
+
+        });
+
+
+    if (error) {
+
+      console.error(
+        "Login error:",
+        error
+      );
+
+
+      message.textContent =
+        error.message;
+
+
+      loginButton.disabled =
+        false;
+
+
+      loginButton.textContent =
+        "Login";
+
+
+      return;
+    }
+
+
+    if (!data.user) {
+
+      message.textContent =
+        "Login failed. Please try again.";
+
+
+      loginButton.disabled =
+        false;
+
+
+      loginButton.textContent =
+        "Login";
+
+
+      return;
+    }
+
+
+
+    /* =========================
+       CHECK ADMIN
+    ========================= */
 
     message.textContent =
-      error.message;
+      "Checking account...";
 
-    return;
+
+    const {
+      data: profile,
+      error: profileError
+    } =
+      await supabaseClient
+        .from("profiles")
+        .select("is_admin")
+        .eq(
+          "id",
+          data.user.id
+        )
+        .maybeSingle();
+
+
+    if (profileError) {
+
+      console.error(
+        "Profile check error:",
+        profileError
+      );
+
+
+      /*
+       * Login succeeded but profile
+       * could not be checked.
+       *
+       * Send user to normal tasks.
+       */
+
+      message.textContent =
+        "Login successful.";
+
+
+      setTimeout(() => {
+
+        window.location.replace(
+          "tasks.html"
+        );
+
+      }, 500);
+
+
+      return;
+    }
+
+
+
+    /* =========================
+       ADMIN REDIRECT
+    ========================= */
+
+    if (
+      profile &&
+      profile.is_admin === true
+    ) {
+
+      message.textContent =
+        "Admin login successful. Opening Admin Panel...";
+
+
+      setTimeout(() => {
+
+        window.location.replace(
+          "admin.html"
+        );
+
+      }, 500);
+
+
+      return;
+    }
+
+
+
+    /* =========================
+       NORMAL USER REDIRECT
+    ========================= */
+
+    message.textContent =
+      "Login successful. Opening Micro Tasks...";
+
+
+    setTimeout(() => {
+
+      window.location.replace(
+        "tasks.html"
+      );
+
+    }, 500);
+
+
+  } catch (error) {
+
+
+    console.error(
+      "Login exception:",
+      error
+    );
+
+
+    message.textContent =
+      "Something went wrong. Please try again.";
+
+
+    loginButton.disabled =
+      false;
+
+
+    loginButton.textContent =
+      "Login";
+
   }
 
-
-  message.textContent =
-    "Login successful!";
-
-
-  setTimeout(() => {
-
-    window.location.href =
-      "tasks.html";
-
-  }, 700);
 }
 
 </script>
 
+
 </body>
+
 </html>
