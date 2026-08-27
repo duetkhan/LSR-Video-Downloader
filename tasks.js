@@ -1661,4 +1661,3 @@ window.requestWithdrawal =
 
 window.logoutUser =
   logoutUser;
-```
