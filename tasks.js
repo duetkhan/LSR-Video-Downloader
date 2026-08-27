@@ -1,4 +1,3 @@
-
 let supabaseClient = null;
 let currentUser = null;
 
@@ -42,6 +41,10 @@ document.addEventListener(
           SUPABASE_PUBLISHABLE_KEY
         );
 
+
+      /*
+        Listen for authentication changes.
+      */
 
       supabaseClient.auth.onAuthStateChange(
         (event, session) => {
@@ -163,6 +166,10 @@ async function checkUser() {
       return;
     }
 
+
+    /*
+      Logged in
+    */
 
     currentUser = user;
 
@@ -487,6 +494,10 @@ async function logoutUser() {
     }
 
 
+    /*
+      Sign out from current browser.
+    */
+
     const {
       error
     } =
@@ -561,6 +572,13 @@ async function logoutUser() {
 
 }
 
+
+/*
+  IMPORTANT:
+  Make logoutUser available to:
+
+  onclick="logoutUser()"
+*/
 
 window.logoutUser =
   logoutUser;
@@ -747,65 +765,54 @@ async function loadTasks() {
             );
 
 
-      let proofArea = "";
+      const proofType =
+        String(
+          task.proof_type || "text"
+        )
+        .toLowerCase()
+        .trim();
 
 
-      /* ---------------------------------
-         TEXT PROOF
-      --------------------------------- */
-
-      if (
-        task.proof_type === "text"
-      ) {
-
-        proofArea = `
-          <textarea
-            id="proof-${Number(task.id)}"
-            rows="4"
-            placeholder="Enter your proof here..."
-          ></textarea>
-        `;
-
-      }
+      const isAttachment =
+        proofType === "attachment" ||
+        proofType === "file" ||
+        proofType === "image" ||
+        proofType === "screenshot";
 
 
-      /* ---------------------------------
-         LINK PROOF
-      --------------------------------- */
+      let proofInput = "";
 
-      else if (
-        task.proof_type === "link"
-      ) {
 
-        proofArea = `
+      if (isAttachment) {
+
+        proofInput = `
+          <label>
+            📎 Upload Proof
+          </label>
+
           <input
-            id="proof-${Number(task.id)}"
-            type="url"
-            placeholder="Enter your proof link..."
-          >
-        `;
-
-      }
-
-
-      /* ---------------------------------
-         ATTACHMENT PROOF
-      --------------------------------- */
-
-      else if (
-        task.proof_type === "attachment"
-      ) {
-
-        proofArea = `
-          <input
-            id="proof-${Number(task.id)}"
             type="file"
-            accept="image/*"
+            id="proof-file-${Number(task.id)}"
+            accept="image/*,.pdf"
           >
 
           <small>
-            Upload a screenshot or image as proof.
+            Upload a screenshot or proof file.
           </small>
+        `;
+
+      } else {
+
+        proofInput = `
+          <textarea
+            id="proof-${Number(task.id)}"
+            rows="4"
+            placeholder="${
+              proofType === "link"
+                ? "Enter your proof link here..."
+                : "Enter your proof here..."
+            }"
+          ></textarea>
         `;
 
       }
@@ -890,22 +897,12 @@ async function loadTasks() {
             </p>
 
 
-            <p>
-              <strong>
-                Proof Type:
-              </strong>
-              ${escapeHtml(
-                task.proof_type || "text"
-              )}
-            </p>
-
-
-            ${proofArea}
+            ${proofInput}
 
 
             <button
               class="submit-task"
-              onclick="submitTask(${Number(task.id)})"
+              onclick="submitTask(${Number(task.id)}, '${proofType}')"
             >
               ✅ Submit Task
             </button>
@@ -952,11 +949,302 @@ function openTask(
 
 
 /* =========================
+   UPLOAD ATTACHMENT
+========================= */
+
+async function uploadProofFile(
+  taskId
+) {
+
+  if (!currentUser) {
+
+    throw new Error(
+      "Please login first."
+    );
+
+  }
+
+
+  const fileElement =
+    document.getElementById(
+      `proof-file-${taskId}`
+    );
+
+
+  if (
+    !fileElement ||
+    !fileElement.files ||
+    fileElement.files.length === 0
+  ) {
+
+    throw new Error(
+      "Please select a proof file."
+    );
+
+  }
+
+
+  const file =
+    fileElement.files[0];
+
+
+  /*
+    Basic file validation
+  */
+
+  const maxSize =
+    10 * 1024 * 1024;
+
+
+  if (
+    file.size > maxSize
+  ) {
+
+    throw new Error(
+      "Proof file must be 10 MB or smaller."
+    );
+
+  }
+
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "application/pdf"
+  ];
+
+
+  if (
+    !allowedTypes.includes(
+      file.type
+    )
+  ) {
+
+    throw new Error(
+      "Invalid proof file type. Use an image or PDF."
+    );
+
+  }
+
+
+  /*
+    Create safe file extension
+  */
+
+  let extension =
+    "bin";
+
+
+  if (
+    file.type === "image/jpeg"
+  ) {
+
+    extension = "jpg";
+
+  } else if (
+    file.type === "image/png"
+  ) {
+
+    extension = "png";
+
+  } else if (
+    file.type === "image/webp"
+  ) {
+
+    extension = "webp";
+
+  } else if (
+    file.type === "image/gif"
+  ) {
+
+    extension = "gif";
+
+  } else if (
+    file.type === "application/pdf"
+  ) {
+
+    extension = "pdf";
+
+  }
+
+
+  /*
+    Storage path:
+
+    user-id / task-id / timestamp.extension
+  */
+
+  const filePath =
+    `${currentUser.id}/${taskId}/${Date.now()}-${cryptoRandomString(12)}.${extension}`;
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from("task-proofs")
+      .upload(
+        filePath,
+        file,
+        {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Proof upload error:",
+      error
+    );
+
+    throw new Error(
+      "Proof upload failed: " +
+      error.message
+    );
+
+  }
+
+
+  return filePath;
+
+}
+
+
+/* =========================
+   RANDOM FILE NAME
+========================= */
+
+function cryptoRandomString(
+  length
+) {
+
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+
+  let result = "";
+
+
+  if (
+    window.crypto &&
+    window.crypto.getRandomValues
+  ) {
+
+    const values =
+      new Uint32Array(
+        length
+      );
+
+
+    window.crypto.getRandomValues(
+      values
+    );
+
+
+    for (
+      let i = 0;
+      i < length;
+      i++
+    ) {
+
+      result +=
+        characters[
+          values[i] %
+          characters.length
+        ];
+
+    }
+
+
+    return result;
+
+  }
+
+
+  for (
+    let i = 0;
+    i < length;
+    i++
+  ) {
+
+    result +=
+      characters.charAt(
+        Math.floor(
+          Math.random() *
+          characters.length
+        )
+      );
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =========================
+   DELETE UPLOADED PROOF
+   IF SUBMISSION FAILS
+========================= */
+
+async function deleteProofFile(
+  filePath
+) {
+
+  if (!filePath) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .storage
+        .from("task-proofs")
+        .remove([
+          filePath
+        ]);
+
+
+    if (error) {
+
+      console.error(
+        "Proof cleanup error:",
+        error
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Proof cleanup exception:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
    SUBMIT TASK
 ========================= */
 
 async function submitTask(
-  taskId
+  taskId,
+  proofType = "text"
 ) {
 
   if (!currentUser) {
@@ -969,88 +1257,98 @@ async function submitTask(
   }
 
 
-  const proofElement =
-    document.getElementById(
-      `proof-${taskId}`
-    );
-
-
   const resultElement =
     document.getElementById(
       `result-${taskId}`
     );
 
 
-  /* ---------------------------------
-     FIND TASK
-  --------------------------------- */
-
-  const {
-    data: task,
-    error: taskError
-  } =
-    await supabaseClient
-      .from("tasks")
-      .select(`
-        id,
-        proof_type
-      `)
-      .eq(
-        "id",
-        taskId
-      )
-      .maybeSingle();
+  const normalizedProofType =
+    String(
+      proofType || "text"
+    )
+    .toLowerCase()
+    .trim();
 
 
-  if (taskError) {
+  const isAttachment =
+    normalizedProofType === "attachment" ||
+    normalizedProofType === "file" ||
+    normalizedProofType === "image" ||
+    normalizedProofType === "screenshot";
 
-    console.error(
-      "Task lookup error:",
-      taskError
-    );
 
-    if (resultElement) {
+  let proof = "";
 
-      resultElement.innerHTML =
-        `<div class="status">
-          Unable to verify task.
-        </div>`;
+  let uploadedFilePath =
+    null;
+
+
+  /*
+    Attachment proof
+  */
+
+  if (isAttachment) {
+
+    try {
+
+      if (resultElement) {
+
+        resultElement.innerHTML =
+          `<div class="status">
+            Uploading proof...
+          </div>`;
+
+      }
+
+
+      uploadedFilePath =
+        await uploadProofFile(
+          taskId
+        );
+
+
+      proof =
+        uploadedFilePath;
+
+
+    } catch (error) {
+
+      console.error(
+        "Attachment proof error:",
+        error
+      );
+
+
+      if (resultElement) {
+
+        resultElement.innerHTML =
+          `<div class="status">
+            ${escapeHtml(
+              error.message
+            )}
+          </div>`;
+
+      }
+
+
+      return;
 
     }
 
-    return;
-  }
+  } else {
+
+    /*
+      Text / Link proof
+    */
+
+    const proofElement =
+      document.getElementById(
+        `proof-${taskId}`
+      );
 
 
-  if (!task) {
-
-    if (resultElement) {
-
-      resultElement.innerHTML =
-        `<div class="status">
-          Task not found.
-        </div>`;
-
-    }
-
-    return;
-  }
-
-
-  const proofType =
-    task.proof_type || "text";
-
-
-  /* ---------------------------------
-     TEXT / LINK PROOF
-  --------------------------------- */
-
-  if (
-    proofType === "text" ||
-    proofType === "link"
-  ) {
-
-    const proof =
+    proof =
       proofElement
         ? proofElement.value.trim()
         : "";
@@ -1067,42 +1365,72 @@ async function submitTask(
 
       }
 
+
       return;
+
     }
 
 
+    /*
+      Link proof validation
+    */
+
     if (
-      proofType === "link"
+      normalizedProofType === "link"
     ) {
 
-      if (!safeProofUrl(proof)) {
+      try {
+
+        const url =
+          new URL(
+            proof
+          );
+
+
+        if (
+          url.protocol !== "http:" &&
+          url.protocol !== "https:"
+        ) {
+
+          throw new Error();
+
+        }
+
+      } catch {
 
         if (resultElement) {
 
           resultElement.innerHTML =
             `<div class="status">
-              Please enter a valid HTTP/HTTPS proof link.
+              Please enter a valid proof link.
             </div>`;
 
         }
 
+
         return;
+
       }
 
     }
 
+  }
 
-    if (resultElement) {
 
-      resultElement.innerHTML =
-        `<div class="status">
-          Submitting...
-        </div>`;
+  if (resultElement) {
 
-    }
+    resultElement.innerHTML =
+      `<div class="status">
+        Submitting...
+      </div>`;
 
+  }
+
+
+  try {
 
     const {
+      data,
       error
     } =
       await supabaseClient.rpc(
@@ -1122,6 +1450,23 @@ async function submitTask(
       );
 
 
+      /*
+        If the database submission
+        failed after upload,
+        remove the uploaded file.
+      */
+
+      if (
+        uploadedFilePath
+      ) {
+
+        await deleteProofFile(
+          uploadedFilePath
+        );
+
+      }
+
+
       if (resultElement) {
 
         resultElement.innerHTML =
@@ -1133,7 +1478,9 @@ async function submitTask(
 
       }
 
+
       return;
+
     }
 
 
@@ -1148,85 +1495,66 @@ async function submitTask(
     }
 
 
+    /*
+      Clear text proof
+    */
+
+    const proofElement =
+      document.getElementById(
+        `proof-${taskId}`
+      );
+
+
     if (proofElement) {
 
-      proofElement.value = "";
+      proofElement.value =
+        "";
+
+    }
+
+
+    /*
+      Clear attachment input
+    */
+
+    const fileElement =
+      document.getElementById(
+        `proof-file-${taskId}`
+      );
+
+
+    if (fileElement) {
+
+      fileElement.value =
+        "";
 
     }
 
 
     await loadSubmissions();
 
-    return;
-  }
 
+  } catch (error) {
 
-  /* ---------------------------------
-     ATTACHMENT PROOF
-  --------------------------------- */
-
-  if (
-    proofType === "attachment"
-  ) {
-
-    const file =
-      proofElement?.files?.[0];
-
-
-    if (!file) {
-
-      if (resultElement) {
-
-        resultElement.innerHTML =
-          `<div class="status">
-            Please select a screenshot or image.
-          </div>`;
-
-      }
-
-      return;
-    }
-
-
-    if (
-      !file.type ||
-      !file.type.startsWith(
-        "image/"
-      )
-    ) {
-
-      if (resultElement) {
-
-        resultElement.innerHTML =
-          `<div class="status">
-            Only image files are allowed.
-          </div>`;
-
-      }
-
-      return;
-    }
+    console.error(
+      "Submit task exception:",
+      error
+    );
 
 
     /*
-      5 MB maximum.
+      Cleanup uploaded proof
+      if RPC unexpectedly fails.
     */
 
     if (
-      file.size >
-      5 * 1024 * 1024
+      uploadedFilePath
     ) {
 
-      if (resultElement) {
+      await deleteProofFile(
+        uploadedFilePath
+      );
 
-        resultElement.innerHTML =
-          `<div class="status">
-            Image must be 5 MB or smaller.
-          </div>`;
-
-      }
-
-      return;
     }
 
 
@@ -1234,183 +1562,13 @@ async function submitTask(
 
       resultElement.innerHTML =
         `<div class="status">
-          Uploading proof...
+          ${escapeHtml(
+            error.message ||
+            "Unable to submit task."
+          )}
         </div>`;
 
     }
-
-
-    try {
-
-      const extension =
-        file.name
-          .split(".")
-          .pop()
-          .toLowerCase();
-
-
-      const fileName =
-        `${currentUser.id}/` +
-        `${taskId}/` +
-        `${Date.now()}.` +
-        extension;
-
-
-      const {
-        error: uploadError
-      } =
-        await supabaseClient
-          .storage
-          .from("task-proofs")
-          .upload(
-            fileName,
-            file,
-            {
-              cacheControl: "3600",
-              upsert: false
-            }
-          );
-
-
-      if (uploadError) {
-
-        console.error(
-          "Proof upload error:",
-          uploadError
-        );
-
-
-        if (resultElement) {
-
-          resultElement.innerHTML =
-            `<div class="status">
-              ❌ Proof upload failed.
-              <br><br>
-              ${escapeHtml(
-                uploadError.message
-              )}
-            </div>`;
-
-        }
-
-        return;
-      }
-
-
-      /*
-        Store the storage path as proof.
-        Admin can use this path to access
-        the uploaded image.
-      */
-
-      const proofPath =
-        fileName;
-
-
-      const {
-        error: submitError
-      } =
-        await supabaseClient.rpc(
-          "submit_task",
-          {
-            p_task_id: taskId,
-            p_proof: proofPath
-          }
-        );
-
-
-      if (submitError) {
-
-        console.error(
-          "Submit attachment error:",
-          submitError
-        );
-
-
-        /*
-          Remove uploaded file if
-          submission itself failed.
-        */
-
-        await supabaseClient
-          .storage
-          .from("task-proofs")
-          .remove([
-            fileName
-          ]);
-
-
-        if (resultElement) {
-
-          resultElement.innerHTML =
-            `<div class="status">
-              ❌ ${escapeHtml(
-                submitError.message
-              )}
-            </div>`;
-
-        }
-
-        return;
-      }
-
-
-      if (resultElement) {
-
-        resultElement.innerHTML =
-          `<div class="status">
-            ✅ Screenshot submitted successfully.
-            Your task is now pending review.
-          </div>`;
-
-      }
-
-
-      if (proofElement) {
-
-        proofElement.value = "";
-
-      }
-
-
-      await loadSubmissions();
-
-
-    } catch (error) {
-
-      console.error(
-        "Attachment submission error:",
-        error
-      );
-
-
-      if (resultElement) {
-
-        resultElement.innerHTML =
-          `<div class="status">
-            ❌ Unable to submit attachment.
-            <br><br>
-            ${escapeHtml(
-              error?.message ||
-              "Unknown error"
-            )}
-          </div>`;
-
-      }
-
-    }
-
-
-    return;
-  }
-
-
-  if (resultElement) {
-
-    resultElement.innerHTML =
-      `<div class="status">
-        Invalid proof type.
-      </div>`;
 
   }
 
@@ -1671,19 +1829,13 @@ async function requestWithdrawal() {
   }
 
 
-  /* ---------------------------------
-     MINIMUM WITHDRAWAL
-  --------------------------------- */
-
-  if (
-    amount < 110
-  ) {
+  if (amount < 110) {
 
     if (message) {
 
       message.innerHTML =
         `<div class="status">
-          Minimum withdrawal is 110 Coins.
+          Minimum withdrawal amount is 110 Coins.
         </div>`;
 
     }
@@ -2000,34 +2152,6 @@ function safeUrl(
   } catch {
 
     return "#";
-
-  }
-
-}
-
-
-/* =========================
-   SAFE PROOF URL
-========================= */
-
-function safeProofUrl(
-  value
-) {
-
-  try {
-
-    const url =
-      new URL(value);
-
-
-    return (
-      url.protocol === "https:" ||
-      url.protocol === "http:"
-    );
-
-  } catch {
-
-    return false;
 
   }
 
