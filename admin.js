@@ -13,7 +13,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     showAccess("Checking admin access...");
 
+
     /* Check Supabase library */
+
     if (typeof supabase === "undefined") {
 
       showAccess(`
@@ -27,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* Check config */
+
     if (
       typeof SUPABASE_URL === "undefined" ||
       typeof SUPABASE_PUBLISHABLE_KEY === "undefined"
@@ -43,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* Create Supabase client */
+
     supabaseClient =
       supabase.createClient(
         SUPABASE_URL,
@@ -51,6 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     /* Check admin */
+
     await checkAdmin();
 
   } catch (error) {
@@ -431,6 +436,7 @@ async function loadTasks() {
         reward,
         task_url,
         proof_type,
+        execution_mode,
         max_completions,
         current_completions,
         status,
@@ -512,6 +518,22 @@ async function loadTasks() {
           Link Proof
         </option>
 
+        <option value="attachment">
+          Attachment Proof (Image/Screenshot)
+        </option>
+
+      </select>
+
+      <select id="newTaskExecutionMode">
+
+        <option value="one_time">
+          One User - One Execution
+        </option>
+
+        <option value="multiple">
+          Multiple Times
+        </option>
+
       </select>
 
       <input
@@ -568,6 +590,12 @@ async function loadTasks() {
           );
 
 
+    const executionMode =
+      task.execution_mode === "one_time"
+        ? "One User - One Execution"
+        : "Multiple Times";
+
+
     return `
 
       <div
@@ -604,6 +632,28 @@ async function loadTasks() {
           )}
           /
           ${max}
+        </p>
+
+        <p>
+          ⚙️ Execution:
+          <strong>
+            ${escapeHtml(
+              executionMode
+            )}
+          </strong>
+        </p>
+
+        <p>
+          🧾 Proof:
+          <strong>
+            ${
+              task.proof_type === "attachment"
+                ? "Attachment"
+                : task.proof_type === "link"
+                  ? "Link"
+                  : "Text"
+            }
+          </strong>
         </p>
 
         <p>
@@ -735,7 +785,48 @@ async function loadTasks() {
               Link Proof
             </option>
 
+            <option
+              value="attachment"
+              ${
+                task.proof_type === "attachment"
+                  ? "selected"
+                  : ""
+              }
+            >
+              Attachment Proof (Image/Screenshot)
+            </option>
+
           </select>
+
+
+          <select
+            id="edit-execution-${Number(task.id)}"
+          >
+
+            <option
+              value="one_time"
+              ${
+                task.execution_mode === "one_time"
+                  ? "selected"
+                  : ""
+              }
+            >
+              One User - One Execution
+            </option>
+
+            <option
+              value="multiple"
+              ${
+                task.execution_mode !== "one_time"
+                  ? "selected"
+                  : ""
+              }
+            >
+              Multiple Times
+            </option>
+
+          </select>
+
 
           <input
             id="edit-max-${Number(task.id)}"
@@ -820,6 +911,11 @@ async function createTask() {
       "newTaskProofType"
     );
 
+  const executionModeElement =
+    document.getElementById(
+      "newTaskExecutionMode"
+    );
+
   const maxElement =
     document.getElementById(
       "newTaskMax"
@@ -833,6 +929,7 @@ async function createTask() {
     !rewardElement ||
     !urlElement ||
     !proofElement ||
+    !executionModeElement ||
     !maxElement
   ) {
 
@@ -868,6 +965,10 @@ async function createTask() {
 
   const proofType =
     proofElement.value;
+
+
+  const executionMode =
+    executionModeElement.value;
 
 
   const maxValue =
@@ -933,6 +1034,41 @@ async function createTask() {
   }
 
 
+  if (
+    ![
+      "text",
+      "link",
+      "attachment"
+    ].includes(proofType)
+  ) {
+
+    message.innerHTML = `
+      <div class="status">
+        Invalid proof type.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (
+    ![
+      "one_time",
+      "multiple"
+    ].includes(executionMode)
+  ) {
+
+    message.innerHTML = `
+      <div class="status">
+        Invalid execution mode.
+      </div>
+    `;
+
+    return;
+  }
+
+
   message.innerHTML = `
     <div class="status">
       Creating task...
@@ -954,6 +1090,8 @@ async function createTask() {
           taskUrl || null,
         p_proof_type:
           proofType,
+        p_execution_mode:
+          executionMode,
         p_max_completions:
           maxCompletions
       }
@@ -1083,6 +1221,12 @@ async function saveTask(id) {
     ).value;
 
 
+  const executionMode =
+    document.getElementById(
+      `edit-execution-${id}`
+    ).value;
+
+
   const maxValue =
     document.getElementById(
       `edit-max-${id}`
@@ -1148,6 +1292,41 @@ async function saveTask(id) {
   }
 
 
+  if (
+    ![
+      "text",
+      "link",
+      "attachment"
+    ].includes(proofType)
+  ) {
+
+    message.innerHTML = `
+      <div class="status">
+        Invalid proof type.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if (
+    ![
+      "one_time",
+      "multiple"
+    ].includes(executionMode)
+  ) {
+
+    message.innerHTML = `
+      <div class="status">
+        Invalid execution mode.
+      </div>
+    `;
+
+    return;
+  }
+
+
   message.innerHTML = `
     <div class="status">
       Saving...
@@ -1172,6 +1351,8 @@ async function saveTask(id) {
           taskUrl || null,
         p_proof_type:
           proofType,
+        p_execution_mode:
+          executionMode,
         p_max_completions:
           maxCompletions
       }
@@ -1426,6 +1607,20 @@ async function loadSubmissions() {
         "Task";
 
 
+      const proof =
+        item.proof ||
+        "";
+
+
+      const isAttachment =
+        proof.startsWith(
+          "http://"
+        ) ||
+        proof.startsWith(
+          "https://"
+        );
+
+
       return `
         <div class="submission">
 
@@ -1468,10 +1663,46 @@ async function loadSubmissions() {
 
             <br><br>
 
-            ${escapeHtml(
-              item.proof ||
-              "No proof provided."
-            )}
+            ${
+              isAttachment
+                ? `
+                  <a
+                    href="${safeUrl(
+                      proof
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src="${safeUrl(
+                        proof
+                      )}"
+                      alt="Task proof attachment"
+                      style="
+                        max-width:100%;
+                        max-height:500px;
+                        border-radius:8px;
+                        display:block;
+                        margin-bottom:10px;
+                      "
+                    >
+                  </a>
+
+                  <a
+                    href="${safeUrl(
+                      proof
+                    )}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    🖼️ Open Full Image
+                  </a>
+                `
+                : escapeHtml(
+                    proof ||
+                    "No proof provided."
+                  )
+            }
 
           </div>
 
@@ -2047,6 +2278,7 @@ function safeUrl(value) {
   } catch {
 
     return "#";
+
   }
 
 }
@@ -2135,4 +2367,5 @@ if (
 ) {
 
   /* Nothing */
+
 }
