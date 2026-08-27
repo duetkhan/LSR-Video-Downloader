@@ -1,31 +1,48 @@
 let supabaseClient = null;
 let adminUser = null;
+let adminProfile = null;
 
 
-/* =========================
+/* =========================================================
    START
-========================= */
+========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  initAdmin
-);
-
-
-async function initAdmin() {
+document.addEventListener("DOMContentLoaded", async () => {
 
   try {
 
+    showAccess("Checking admin access...");
+
+    /* Check Supabase library */
     if (typeof supabase === "undefined") {
 
-      showAccess(
-        "Supabase library failed to load."
-      );
+      showAccess(`
+        ❌ Supabase library failed to load.
+        <br><br>
+        Please refresh the page.
+      `);
 
       return;
     }
 
 
+    /* Check config */
+    if (
+      typeof SUPABASE_URL === "undefined" ||
+      typeof SUPABASE_PUBLISHABLE_KEY === "undefined"
+    ) {
+
+      showAccess(`
+        ❌ Supabase configuration is missing.
+        <br><br>
+        Check supabase-config.js
+      `);
+
+      return;
+    }
+
+
+    /* Create Supabase client */
     supabaseClient =
       supabase.createClient(
         SUPABASE_URL,
@@ -33,52 +50,116 @@ async function initAdmin() {
       );
 
 
+    /* Check admin */
     await checkAdmin();
 
   } catch (error) {
 
-    console.error(error);
-
-    showAccess(
-      "Unable to load admin panel."
+    console.error(
+      "Admin initialization error:",
+      error
     );
+
+    showAccess(`
+      ❌ Unable to load admin panel.
+      <br><br>
+      ${escapeHtml(
+        error?.message ||
+        "Unknown error"
+      )}
+    `);
   }
-}
+
+});
 
 
-/* =========================
+/* =========================================================
    CHECK ADMIN
-========================= */
+========================================================= */
 
 async function checkAdmin() {
 
-  const {
-    data: {
-      user
-    },
-    error
-  } =
-    await supabaseClient.auth.getUser();
-
-
-  if (error) {
-
-    console.error(error);
+  if (!supabaseClient) {
 
     showAccess(
-      "Unable to check login."
+      "Supabase is not initialized."
     );
 
     return;
   }
 
 
+  showAccess(
+    "Checking admin access..."
+  );
+
+
+  /* -------------------------------------------------------
+     Get current session
+  ------------------------------------------------------- */
+
+  const {
+    data: sessionData,
+    error: sessionError
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if (sessionError) {
+
+    console.error(
+      "Session error:",
+      sessionError
+    );
+
+    showAccess(`
+      ❌ Unable to check login.
+      <br><br>
+      ${escapeHtml(
+        sessionError.message
+      )}
+    `);
+
+    return;
+  }
+
+
+  const session =
+    sessionData?.session;
+
+
+  const user =
+    session?.user;
+
+
+  /* -------------------------------------------------------
+     Not logged in
+  ------------------------------------------------------- */
+
   if (!user) {
+
+    adminUser = null;
+    adminProfile = null;
+
+    hideAdminPanel();
 
     showAccess(`
       ⛔ You are not logged in.
       <br><br>
-      <a href="login.html">Login</a>
+
+      <a
+        href="login.html"
+        style="
+          display:inline-block;
+          padding:10px 15px;
+          background:#2563eb;
+          color:#fff;
+          text-decoration:none;
+          border-radius:8px;
+        "
+      >
+        Login
+      </a>
     `);
 
     return;
@@ -87,6 +168,10 @@ async function checkAdmin() {
 
   adminUser = user;
 
+
+  /* -------------------------------------------------------
+     Load profile
+  ------------------------------------------------------- */
 
   const {
     data: profile,
@@ -107,30 +192,129 @@ async function checkAdmin() {
 
   if (profileError) {
 
-    console.error(profileError);
-
-    showAccess(
-      "Unable to verify admin account."
+    console.error(
+      "Profile error:",
+      profileError
     );
 
-    return;
-  }
-
-
-  if (
-    !profile ||
-    profile.is_admin !== true
-  ) {
+    hideAdminPanel();
 
     showAccess(`
-      ⛔ Access denied.
+      ❌ Unable to verify admin account.
       <br><br>
-      Admin account required.
+
+      ${escapeHtml(
+        profileError.message
+      )}
+
+      <br><br>
+
+      <small>
+        Make sure your profile exists and
+        your account has admin access.
+      </small>
     `);
 
     return;
   }
 
+
+  if (!profile) {
+
+    hideAdminPanel();
+
+    showAccess(`
+      ❌ Admin profile not found.
+      <br><br>
+
+      Your login account does not have
+      a matching profile.
+    `);
+
+    return;
+  }
+
+
+  /* -------------------------------------------------------
+     Check admin flag
+  ------------------------------------------------------- */
+
+  if (profile.is_admin !== true) {
+
+    adminProfile = profile;
+
+    hideAdminPanel();
+
+    showAccess(`
+      ⛔ Access denied.
+      <br><br>
+
+      This account is not an administrator.
+
+      <br><br>
+
+      <strong>
+        ${escapeHtml(
+          user.email || "User"
+        )}
+      </strong>
+    `);
+
+    return;
+  }
+
+
+  /* -------------------------------------------------------
+     ADMIN VERIFIED
+  ------------------------------------------------------- */
+
+  adminProfile = profile;
+
+
+  showAdminPanel();
+
+
+  const adminName =
+    document.getElementById(
+      "adminName"
+    );
+
+
+  if (adminName) {
+
+    adminName.textContent =
+      profile.username ||
+      user.email?.split("@")[0] ||
+      "Admin";
+  }
+
+
+  const adminEmail =
+    document.getElementById(
+      "adminEmail"
+    );
+
+
+  if (adminEmail) {
+
+    adminEmail.textContent =
+      user.email || "";
+  }
+
+
+  showAccess("");
+
+
+  await loadAdminData();
+
+}
+
+
+/* =========================================================
+   SHOW ADMIN PANEL
+========================================================= */
+
+function showAdminPanel() {
 
   const accessStatus =
     document.getElementById(
@@ -159,37 +343,53 @@ async function checkAdmin() {
     );
   }
 
-
-  const adminName =
-    document.getElementById(
-      "adminName"
-    );
-
-
-  if (adminName) {
-
-    adminName.textContent =
-      profile.username ||
-      user.email?.split("@")[0] ||
-      "Admin";
-  }
-
-
-  await loadAdminData();
 }
 
 
-/* =========================
+/* =========================================================
+   HIDE ADMIN PANEL
+========================================================= */
+
+function hideAdminPanel() {
+
+  const adminPanel =
+    document.getElementById(
+      "adminPanel"
+    );
+
+
+  if (adminPanel) {
+
+    adminPanel.classList.add(
+      "hidden"
+    );
+  }
+
+}
+
+
+/* =========================================================
    LOAD ADMIN DATA
-========================= */
+========================================================= */
 
 async function loadAdminData() {
 
-  await Promise.all([
-    loadSubmissions(),
-    loadWithdrawals(),
-    loadTasks()
-  ]);
+  try {
+
+    await Promise.all([
+      loadSubmissions(),
+      loadWithdrawals(),
+      loadTasks()
+    ]);
+
+  } catch (error) {
+
+    console.error(
+      "Admin data error:",
+      error
+    );
+  }
+
 }
 
 
@@ -246,7 +446,10 @@ async function loadTasks() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Load tasks error:",
+      error
+    );
 
     list.innerHTML = `
       <div class="status">
@@ -299,9 +502,8 @@ async function loadTasks() {
         placeholder="Task URL (optional)"
       >
 
-      <select
-        id="newTaskProofType"
-      >
+      <select id="newTaskProofType">
+
         <option value="text">
           Text Proof
         </option>
@@ -309,6 +511,7 @@ async function loadTasks() {
         <option value="link">
           Link Proof
         </option>
+
       </select>
 
       <input
@@ -325,9 +528,7 @@ async function loadTasks() {
         ➕ Create Task
       </button>
 
-      <div
-        id="taskCreateMessage"
-      ></div>
+      <div id="taskCreateMessage"></div>
 
     </div>
 
@@ -353,288 +554,324 @@ async function loadTasks() {
   }
 
 
-  html += data.map(
-    task => {
+  html += data.map(task => {
 
-      const active =
-        task.status === "active";
-
-
-      const max =
-        task.max_completions === null
-          ? "Unlimited"
-          : Number(
-              task.max_completions
-            );
+    const active =
+      task.status === "active";
 
 
-      return `
+    const max =
+      task.max_completions === null
+        ? "Unlimited"
+        : Number(
+            task.max_completions
+          );
+
+
+    return `
+
+      <div
+        class="task-admin-card"
+        id="admin-task-${Number(task.id)}"
+      >
+
+        <h3>
+          ${escapeHtml(
+            task.title
+          )}
+        </h3>
+
+        <p>
+          ${escapeHtml(
+            task.description || ""
+          )}
+        </p>
+
+        <p>
+          🪙 Reward:
+          <strong>
+            ${Number(
+              task.reward || 0
+            )}
+            Coins
+          </strong>
+        </p>
+
+        <p>
+          📊 Completions:
+          ${Number(
+            task.current_completions || 0
+          )}
+          /
+          ${max}
+        </p>
+
+        <p>
+          Status:
+          <strong>
+            ${escapeHtml(
+              task.status
+            )}
+          </strong>
+        </p>
+
+        ${
+          task.task_url
+            ? `
+              <p>
+                🔗
+                <a
+                  href="${safeUrl(
+                    task.task_url
+                  )}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Task
+                </a>
+              </p>
+            `
+            : ""
+        }
+
+        <button
+          onclick="editTask(${Number(task.id)})"
+        >
+          ✏️ Edit
+        </button>
+
+        <button
+          onclick="toggleTaskStatus(
+            ${Number(task.id)},
+            '${active ? "inactive" : "active"}'
+          )"
+        >
+          ${
+            active
+              ? "🔴 Deactivate"
+              : "🟢 Activate"
+          }
+        </button>
+
+        <button
+          class="reject"
+          onclick="deleteTask(${Number(task.id)})"
+        >
+          🗑️ Delete
+        </button>
+
 
         <div
-          class="task-admin-card"
-          id="admin-task-${Number(task.id)}"
+          id="edit-${Number(task.id)}"
+          class="hidden"
         >
 
-          <h3>
-            ${escapeHtml(
+          <hr>
+
+          <input
+            id="edit-title-${Number(task.id)}"
+            value="${escapeAttribute(
               task.title
-            )}
-          </h3>
+            )}"
+            placeholder="Task title"
+          >
 
-          <p>
-            ${escapeHtml(
-              task.description || ""
-            )}
-          </p>
+          <textarea
+            id="edit-description-${Number(task.id)}"
+            placeholder="Description"
+          >${escapeHtml(
+            task.description || ""
+          )}</textarea>
 
-          <p>
-            🪙 Reward:
-            <strong>
-              ${Number(
-                task.reward || 0
-              )}
-              Coins
-            </strong>
-          </p>
+          <textarea
+            id="edit-instructions-${Number(task.id)}"
+            placeholder="Instructions"
+          >${escapeHtml(
+            task.instructions || ""
+          )}</textarea>
 
-          <p>
-            📊 Completions:
-            ${Number(
-              task.current_completions || 0
-            )}
-            /
-            ${max}
-          </p>
+          <input
+            id="edit-reward-${Number(task.id)}"
+            type="number"
+            min="1"
+            value="${Number(
+              task.reward || 0
+            )}"
+            placeholder="Reward"
+          >
 
-          <p>
-            Status:
-            <strong>
-              ${escapeHtml(
-                task.status
-              )}
-            </strong>
-          </p>
+          <input
+            id="edit-url-${Number(task.id)}"
+            type="url"
+            value="${escapeAttribute(
+              task.task_url || ""
+            )}"
+            placeholder="Task URL"
+          >
 
-          ${
-            task.task_url
-              ? `
-                <p>
-                  🔗
-                  <a
-                    href="${safeUrl(
-                      task.task_url
-                    )}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Open Task
-                  </a>
-                </p>
-              `
-              : ""
-          }
+          <select
+            id="edit-proof-${Number(task.id)}"
+          >
 
+            <option
+              value="text"
+              ${
+                task.proof_type === "text"
+                  ? "selected"
+                  : ""
+              }
+            >
+              Text Proof
+            </option>
+
+            <option
+              value="link"
+              ${
+                task.proof_type === "link"
+                  ? "selected"
+                  : ""
+              }
+            >
+              Link Proof
+            </option>
+
+          </select>
+
+          <input
+            id="edit-max-${Number(task.id)}"
+            type="number"
+            min="1"
+            value="${
+              task.max_completions === null
+                ? ""
+                : Number(
+                    task.max_completions
+                  )
+            }"
+            placeholder="Maximum completions"
+          >
+
+          <br>
 
           <button
-            onclick="editTask(${Number(task.id)})"
+            class="approve"
+            onclick="saveTask(${Number(task.id)})"
           >
-            ✏️ Edit
+            💾 Save Changes
           </button>
-
 
           <button
-            onclick="toggleTaskStatus(
-              ${Number(task.id)},
-              '${active ? "inactive" : "active"}'
-            )"
+            onclick="cancelEdit(${Number(task.id)})"
           >
-            ${
-              active
-                ? "🔴 Deactivate"
-                : "🟢 Activate"
-            }
+            Cancel
           </button>
-
-
-          <button
-            class="reject"
-            onclick="deleteTask(${Number(task.id)})"
-          >
-            🗑️ Delete
-          </button>
-
 
           <div
-            id="edit-${Number(task.id)}"
-            class="hidden"
-          >
-
-            <hr>
-
-            <input
-              id="edit-title-${Number(task.id)}"
-              value="${escapeAttribute(
-                task.title
-              )}"
-              placeholder="Task title"
-            >
-
-            <textarea
-              id="edit-description-${Number(task.id)}"
-              placeholder="Description"
-            >${escapeHtml(
-              task.description || ""
-            )}</textarea>
-
-            <textarea
-              id="edit-instructions-${Number(task.id)}"
-              placeholder="Instructions"
-            >${escapeHtml(
-              task.instructions || ""
-            )}</textarea>
-
-            <input
-              id="edit-reward-${Number(task.id)}"
-              type="number"
-              min="1"
-              value="${Number(
-                task.reward || 0
-              )}"
-              placeholder="Reward"
-            >
-
-            <input
-              id="edit-url-${Number(task.id)}"
-              type="url"
-              value="${escapeAttribute(
-                task.task_url || ""
-              )}"
-              placeholder="Task URL"
-            >
-
-            <select
-              id="edit-proof-${Number(task.id)}"
-            >
-
-              <option
-                value="text"
-                ${
-                  task.proof_type === "text"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Text Proof
-              </option>
-
-              <option
-                value="link"
-                ${
-                  task.proof_type === "link"
-                    ? "selected"
-                    : ""
-                }
-              >
-                Link Proof
-              </option>
-
-            </select>
-
-            <input
-              id="edit-max-${Number(task.id)}"
-              type="number"
-              min="1"
-              value="${
-                task.max_completions === null
-                  ? ""
-                  : Number(
-                      task.max_completions
-                    )
-              }"
-              placeholder="Maximum completions"
-            >
-
-            <br>
-
-            <button
-              class="approve"
-              onclick="saveTask(${Number(task.id)})"
-            >
-              💾 Save Changes
-            </button>
-
-            <button
-              onclick="cancelEdit(${Number(task.id)})"
-            >
-              Cancel
-            </button>
-
-            <div
-              id="edit-message-${Number(task.id)}"
-            ></div>
-
-          </div>
+            id="edit-message-${Number(task.id)}"
+          ></div>
 
         </div>
 
-      `;
+      </div>
 
-    }
-  ).join("");
+    `;
+
+  }).join("");
 
 
   list.innerHTML = html;
+
 }
 
 
-/* =========================
+/* =========================================================
    CREATE TASK
-========================= */
+========================================================= */
 
 async function createTask() {
 
-  const title =
+  const titleElement =
     document.getElementById(
       "newTaskTitle"
-    ).value.trim();
+    );
+
+  const descriptionElement =
+    document.getElementById(
+      "newTaskDescription"
+    );
+
+  const instructionsElement =
+    document.getElementById(
+      "newTaskInstructions"
+    );
+
+  const rewardElement =
+    document.getElementById(
+      "newTaskReward"
+    );
+
+  const urlElement =
+    document.getElementById(
+      "newTaskUrl"
+    );
+
+  const proofElement =
+    document.getElementById(
+      "newTaskProofType"
+    );
+
+  const maxElement =
+    document.getElementById(
+      "newTaskMax"
+    );
+
+
+  if (
+    !titleElement ||
+    !descriptionElement ||
+    !instructionsElement ||
+    !rewardElement ||
+    !urlElement ||
+    !proofElement ||
+    !maxElement
+  ) {
+
+    alert(
+      "Task form is not ready."
+    );
+
+    return;
+  }
+
+
+  const title =
+    titleElement.value.trim();
 
 
   const description =
-    document.getElementById(
-      "newTaskDescription"
-    ).value.trim();
+    descriptionElement.value.trim();
 
 
   const instructions =
-    document.getElementById(
-      "newTaskInstructions"
-    ).value.trim();
+    instructionsElement.value.trim();
 
 
   const reward =
     Number(
-      document.getElementById(
-        "newTaskReward"
-      ).value
+      rewardElement.value
     );
 
 
   const taskUrl =
-    document.getElementById(
-      "newTaskUrl"
-    ).value.trim();
+    urlElement.value.trim();
 
 
   const proofType =
-    document.getElementById(
-      "newTaskProofType"
-    ).value;
+    proofElement.value;
 
 
   const maxValue =
-    document.getElementById(
-      "newTaskMax"
-    ).value.trim();
+    maxElement.value.trim();
 
 
   const maxCompletions =
@@ -651,10 +888,11 @@ async function createTask() {
 
   if (!title) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Enter a task title.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -665,10 +903,11 @@ async function createTask() {
     reward <= 0
   ) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Enter a valid reward.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -684,23 +923,24 @@ async function createTask() {
     )
   ) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Enter a valid maximum completion value.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
 
 
-  message.innerHTML =
-    `<div class="status">
+  message.innerHTML = `
+    <div class="status">
       Creating task...
-    </div>`;
+    </div>
+  `;
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -722,57 +962,46 @@ async function createTask() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Create task error:",
+      error
+    );
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         ❌ ${escapeHtml(
           error.message
         )}
-      </div>`;
+      </div>
+    `;
 
     return;
   }
 
 
-  message.innerHTML =
-    `<div class="status">
+  message.innerHTML = `
+    <div class="status">
       ✅ Task created successfully.
-    </div>`;
+    </div>
+  `;
 
 
-  document.getElementById(
-    "newTaskTitle"
-  ).value = "";
-
-  document.getElementById(
-    "newTaskDescription"
-  ).value = "";
-
-  document.getElementById(
-    "newTaskInstructions"
-  ).value = "";
-
-  document.getElementById(
-    "newTaskReward"
-  ).value = "";
-
-  document.getElementById(
-    "newTaskUrl"
-  ).value = "";
-
-  document.getElementById(
-    "newTaskMax"
-  ).value = "";
+  titleElement.value = "";
+  descriptionElement.value = "";
+  instructionsElement.value = "";
+  rewardElement.value = "";
+  urlElement.value = "";
+  maxElement.value = "";
 
 
   await loadTasks();
+
 }
 
 
-/* =========================
+/* =========================================================
    EDIT TASK
-========================= */
+========================================================= */
 
 function editTask(id) {
 
@@ -782,14 +1011,13 @@ function editTask(id) {
     );
 
 
-  if (!box) {
-    return;
+  if (box) {
+
+    box.classList.remove(
+      "hidden"
+    );
   }
 
-
-  box.classList.remove(
-    "hidden"
-  );
 }
 
 
@@ -801,20 +1029,19 @@ function cancelEdit(id) {
     );
 
 
-  if (!box) {
-    return;
+  if (box) {
+
+    box.classList.add(
+      "hidden"
+    );
   }
 
-
-  box.classList.add(
-    "hidden"
-  );
 }
 
 
-/* =========================
+/* =========================================================
    SAVE TASK
-========================= */
+========================================================= */
 
 async function saveTask(id) {
 
@@ -876,10 +1103,11 @@ async function saveTask(id) {
 
   if (!title) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Title is required.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -890,10 +1118,11 @@ async function saveTask(id) {
     reward <= 0
   ) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Invalid reward.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -909,23 +1138,24 @@ async function saveTask(id) {
     )
   ) {
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         Invalid maximum completions.
-      </div>`;
+      </div>
+    `;
 
     return;
   }
 
 
-  message.innerHTML =
-    `<div class="status">
+  message.innerHTML = `
+    <div class="status">
       Saving...
-    </div>`;
+    </div>
+  `;
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -950,14 +1180,18 @@ async function saveTask(id) {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Update task error:",
+      error
+    );
 
-    message.innerHTML =
-      `<div class="status">
+    message.innerHTML = `
+      <div class="status">
         ❌ ${escapeHtml(
           error.message
         )}
-      </div>`;
+      </div>
+    `;
 
     return;
   }
@@ -969,12 +1203,13 @@ async function saveTask(id) {
 
 
   await loadTasks();
+
 }
 
 
-/* =========================
+/* =========================================================
    ACTIVATE / DEACTIVATE
-========================= */
+========================================================= */
 
 async function toggleTaskStatus(
   id,
@@ -998,7 +1233,6 @@ async function toggleTaskStatus(
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1012,7 +1246,10 @@ async function toggleTaskStatus(
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Task status error:",
+      error
+    );
 
     alert(
       "❌ Status change failed:\n\n" +
@@ -1031,12 +1268,13 @@ async function toggleTaskStatus(
 
 
   await loadTasks();
+
 }
 
 
-/* =========================
+/* =========================================================
    DELETE TASK
-========================= */
+========================================================= */
 
 async function deleteTask(id) {
 
@@ -1052,7 +1290,6 @@ async function deleteTask(id) {
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1065,7 +1302,10 @@ async function deleteTask(id) {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Delete task error:",
+      error
+    );
 
     alert(
       "❌ Delete failed:\n\n" +
@@ -1082,6 +1322,7 @@ async function deleteTask(id) {
 
 
   await loadTasks();
+
 }
 
 
@@ -1143,7 +1384,10 @@ async function loadSubmissions() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Submissions error:",
+      error
+    );
 
     list.innerHTML = `
       <div class="status">
@@ -1186,9 +1430,7 @@ async function loadSubmissions() {
         <div class="submission">
 
           <h3>
-            📋 ${escapeHtml(
-              title
-            )}
+            📋 ${escapeHtml(title)}
           </h3>
 
           <p>
@@ -1251,16 +1493,15 @@ async function loadSubmissions() {
       `;
 
     }).join("");
+
 }
 
 
-/* =========================
+/* =========================================================
    APPROVE SUBMISSION
-========================= */
+========================================================= */
 
-async function approveSubmission(
-  id
-) {
+async function approveSubmission(id) {
 
   if (
     !confirm(
@@ -1273,7 +1514,6 @@ async function approveSubmission(
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1306,16 +1546,15 @@ async function approveSubmission(
 
 
   await loadAdminData();
+
 }
 
 
-/* =========================
+/* =========================================================
    REJECT SUBMISSION
-========================= */
+========================================================= */
 
-async function rejectSubmission(
-  id
-) {
+async function rejectSubmission(id) {
 
   const note =
     prompt(
@@ -1329,7 +1568,6 @@ async function rejectSubmission(
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1363,6 +1601,7 @@ async function rejectSubmission(
 
 
   await loadAdminData();
+
 }
 
 
@@ -1421,7 +1660,10 @@ async function loadWithdrawals() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      "Withdrawals error:",
+      error
+    );
 
     list.innerHTML = `
       <div class="status">
@@ -1518,16 +1760,15 @@ async function loadWithdrawals() {
       `;
 
     }).join("");
+
 }
 
 
-/* =========================
+/* =========================================================
    APPROVE WITHDRAWAL
-========================= */
+========================================================= */
 
-async function approveWithdrawal(
-  id
-) {
+async function approveWithdrawal(id) {
 
   if (
     !confirm(
@@ -1540,7 +1781,6 @@ async function approveWithdrawal(
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1572,16 +1812,15 @@ async function approveWithdrawal(
 
 
   await loadAdminData();
+
 }
 
 
-/* =========================
+/* =========================================================
    REJECT WITHDRAWAL
-========================= */
+========================================================= */
 
-async function rejectWithdrawal(
-  id
-) {
+async function rejectWithdrawal(id) {
 
   const note =
     prompt(
@@ -1595,7 +1834,6 @@ async function rejectWithdrawal(
 
 
   const {
-    data,
     error
   } =
     await supabaseClient.rpc(
@@ -1630,12 +1868,13 @@ async function rejectWithdrawal(
 
 
   await loadAdminData();
+
 }
 
 
-/* =========================
+/* =========================================================
    ADMIN LOGOUT
-========================= */
+========================================================= */
 
 async function adminLogout() {
 
@@ -1649,38 +1888,91 @@ async function adminLogout() {
   }
 
 
-  const {
-    error
-  } =
-    await supabaseClient.auth.signOut();
-
-
-  if (error) {
-
-    console.error(error);
-
-    alert(
-      "Logout failed:\n\n" +
-      error.message
+  const button =
+    document.getElementById(
+      "adminLogoutButton"
     );
 
-    return;
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.textContent =
+      "Logging out...";
   }
 
 
-  window.location.replace(
-    "login.html"
-  );
+  try {
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.signOut();
+
+
+    if (error) {
+
+      console.error(
+        "Admin logout error:",
+        error
+      );
+
+      alert(
+        "Logout failed:\n\n" +
+        error.message
+      );
+
+      if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+          "Logout";
+      }
+
+      return;
+    }
+
+
+    adminUser = null;
+    adminProfile = null;
+
+
+    window.location.replace(
+      "login.html"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Logout exception:",
+      error
+    );
+
+    alert(
+      "Logout failed. Please try again."
+    );
+
+
+    if (button) {
+
+      button.disabled = false;
+
+      button.textContent =
+        "Logout";
+    }
+
+  }
+
 }
 
 
-/* =========================
+/* =========================================================
    ACCESS MESSAGE
-========================= */
+========================================================= */
 
-function showAccess(
-  message
-) {
+function showAccess(message) {
 
   const element =
     document.getElementById(
@@ -1693,64 +1985,44 @@ function showAccess(
     element.innerHTML =
       message;
   }
+
 }
 
 
-/* =========================
+/* =========================================================
    ESCAPE HTML
-========================= */
+========================================================= */
 
-function escapeHtml(
-  value
-) {
+function escapeHtml(value) {
 
   return String(
     value ?? ""
   )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
 }
 
 
-/* =========================
+/* =========================================================
    ESCAPE ATTRIBUTE
-========================= */
+========================================================= */
 
-function escapeAttribute(
-  value
-) {
+function escapeAttribute(value) {
 
-  return escapeHtml(
-    value
-  );
+  return escapeHtml(value);
+
 }
 
 
-/* =========================
+/* =========================================================
    SAFE URL
-========================= */
+========================================================= */
 
-function safeUrl(
-  value
-) {
+function safeUrl(value) {
 
   try {
 
@@ -1762,10 +2034,8 @@ function safeUrl(
 
 
     if (
-      url.protocol ===
-        "http:" ||
-      url.protocol ===
-        "https:"
+      url.protocol === "http:" ||
+      url.protocol === "https:"
     ) {
 
       return url.href;
@@ -1778,16 +2048,15 @@ function safeUrl(
 
     return "#";
   }
+
 }
 
 
-/* =========================
+/* =========================================================
    DATE
-========================= */
+========================================================= */
 
-function formatDate(
-  value
-) {
+function formatDate(value) {
 
   if (!value) {
     return "—";
@@ -1809,5 +2078,61 @@ function formatDate(
 
 
   return date.toLocaleString();
+
 }
-```
+
+
+/* =========================================================
+   AUTH STATE LISTENER
+========================================================= */
+
+function setupAuthListener() {
+
+  if (!supabaseClient) {
+    return;
+  }
+
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, session) => {
+
+      console.log(
+        "Auth event:",
+        event
+      );
+
+
+      if (
+        event === "SIGNED_OUT"
+      ) {
+
+        adminUser = null;
+        adminProfile = null;
+
+        window.location.replace(
+          "login.html"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SETUP AUTH LISTENER AFTER LOAD
+========================================================= */
+
+const originalInit =
+  window.initAdmin;
+
+
+if (
+  typeof originalInit ===
+  "function"
+) {
+
+  /* Nothing */
+}
