@@ -44,12 +44,11 @@ document.addEventListener(
 
 
       /*
-        Listen for Supabase authentication changes.
-        This keeps the UI synchronized with login/logout.
+        Listen for authentication changes.
       */
 
       supabaseClient.auth.onAuthStateChange(
-        async (event, session) => {
+        (event, session) => {
 
           console.log(
             "Auth event:",
@@ -64,8 +63,6 @@ document.addEventListener(
 
             currentUser = null;
 
-            updateAuthButtons(false);
-
             resetGuestUI();
 
           }
@@ -76,6 +73,7 @@ document.addEventListener(
 
       await checkUser();
 
+
     } catch (error) {
 
       console.error(error);
@@ -83,6 +81,7 @@ document.addEventListener(
       showUserStatus(
         "Unable to connect to the task system."
       );
+
     }
 
   }
@@ -120,23 +119,15 @@ async function checkUser() {
 
       currentUser = null;
 
-      updateAuthButtons(false);
-
       resetGuestUI();
 
       return;
     }
 
 
-    /*
-      USER NOT LOGGED IN
-    */
-
     if (!user) {
 
       currentUser = null;
-
-      updateAuthButtons(false);
 
       resetGuestUI();
 
@@ -178,7 +169,7 @@ async function checkUser() {
 
 
     /*
-      USER IS LOGGED IN
+      Logged in
     */
 
     currentUser = user;
@@ -192,10 +183,6 @@ async function checkUser() {
     );
 
 
-    /*
-      Load user information
-    */
-
     await loadProfile();
 
     await loadWallet();
@@ -206,11 +193,6 @@ async function checkUser() {
 
     await loadWithdrawals();
 
-
-    /*
-      Hide Login + Sign Up
-      Show Logout
-    */
 
     updateAuthButtons(true);
 
@@ -224,9 +206,8 @@ async function checkUser() {
 
     currentUser = null;
 
-    updateAuthButtons(false);
-
     resetGuestUI();
+
   }
 
 }
@@ -317,9 +298,6 @@ async function loadProfile() {
       error
     );
 
-    /*
-      Fallback username
-    */
 
     const usernameElement =
       document.getElementById(
@@ -335,6 +313,7 @@ async function loadProfile() {
           : "User";
 
     }
+
 
     return;
   }
@@ -399,10 +378,6 @@ function updateAuthButtons(
 
   if (loggedIn) {
 
-    /*
-      LOGGED IN
-    */
-
     if (loginButton) {
 
       loginButton.classList.add(
@@ -437,10 +412,6 @@ function updateAuthButtons(
 
 
   } else {
-
-    /*
-      LOGGED OUT
-    */
 
     if (loginButton) {
 
@@ -496,10 +467,6 @@ async function logoutUser() {
     );
 
 
-  /*
-    Prevent double-click
-  */
-
   if (logoutButton) {
 
     logoutButton.disabled =
@@ -513,10 +480,6 @@ async function logoutUser() {
 
   try {
 
-    /*
-      Make sure Supabase client exists
-    */
-
     if (!supabaseClient) {
 
       currentUser = null;
@@ -528,14 +491,12 @@ async function logoutUser() {
       );
 
       return;
+
     }
 
 
     /*
-      Sign out from the current browser/session.
-
-      scope: "local" is intentional.
-      It removes the current local session.
+      Sign out from current browser.
     */
 
     const {
@@ -549,49 +510,59 @@ async function logoutUser() {
     if (error) {
 
       console.error(
-        "Supabase logout error:",
+        "Logout error:",
         error
       );
 
+
       /*
-        Try one more local sign-out.
+        Do not leave the user
+        in the logged-in UI.
       */
 
-      try {
+      currentUser = null;
 
-        await supabaseClient.auth.signOut();
+      resetGuestUI();
 
-      } catch (secondError) {
 
-        console.error(
-          "Second logout attempt failed:",
-          secondError
-        );
+      alert(
+        "Logout failed: " +
+        error.message
+      );
+
+
+      if (logoutButton) {
+
+        logoutButton.disabled =
+          false;
+
+        logoutButton.textContent =
+          "Logout";
 
       }
+
+
+      return;
 
     }
 
 
     /*
-      Clear application state
+      Clear application state.
     */
 
     currentUser = null;
 
 
     /*
-      Reset visible UI
+      Reset UI.
     */
 
     resetGuestUI();
 
 
     /*
-      IMPORTANT:
-      Replace instead of href so the user
-      does not stay on the authenticated
-      page through browser history.
+      Go to login page.
     */
 
     window.location.replace(
@@ -608,18 +579,14 @@ async function logoutUser() {
 
 
     /*
-      Even if an unexpected error happens,
-      clear our local application state.
+      Clear application state
+      even if an unexpected error occurs.
     */
 
     currentUser = null;
 
     resetGuestUI();
 
-
-    /*
-      Send user to login page.
-    */
 
     window.location.replace(
       "login.html"
@@ -631,13 +598,10 @@ async function logoutUser() {
 
 
 /*
-  VERY IMPORTANT
-
-  Your HTML uses:
+  IMPORTANT:
+  Make logoutUser available to:
 
   onclick="logoutUser()"
-
-  Therefore expose the function globally.
 */
 
 window.logoutUser =
@@ -855,6 +819,7 @@ async function loadTasks() {
             ${remaining}
           </p>
 
+
           <button
             class="start-task"
             onclick="openTask(${Number(task.id)})"
@@ -893,6 +858,7 @@ async function loadTasks() {
                 Instructions:
               </strong>
             </p>
+
 
             <p>
               ${escapeHtml(
@@ -1004,6 +970,7 @@ async function submitTask(
 
     }
 
+
     return;
   }
 
@@ -1049,6 +1016,7 @@ async function submitTask(
         </div>`;
 
     }
+
 
     return;
   }
@@ -1174,9 +1142,7 @@ async function loadSubmissions() {
         <div class="history-item">
 
           <strong>
-            ${escapeHtml(
-              title
-            )}
+            ${escapeHtml(title)}
           </strong>
 
           <br><br>
@@ -1695,3 +1661,4 @@ window.requestWithdrawal =
 
 window.logoutUser =
   logoutUser;
+```
