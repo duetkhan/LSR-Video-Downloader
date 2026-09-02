@@ -18,25 +18,27 @@ function md5(value) {
 }
 
 
-export default async function handler(req, res) {
-
-  // Only POST requests
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      success: false,
-      error: "Method not allowed"
-    });
+function getData(req) {
+  // GET request
+  if (req.method === "GET") {
+    return req.query || {};
   }
 
+  // POST request
+  return req.body || {};
+}
+
+
+export default async function handler(req, res) {
+
+  // CPX postback can be received through GET or POST
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
 
   try {
 
-    const body = req.body || {};
-
-
-    /*
-      CPX parameters
-    */
+    const body = getData(req);
 
     const status =
       Number(body.status);
@@ -82,29 +84,34 @@ export default async function handler(req, res) {
       String(body.hash || "");
 
 
-    /*
-      Basic validation
-    */
-
+    // Check required environment variables
     if (
-      !transId ||
-      !userId ||
-      !receivedHash ||
+      !SUPABASE_URL ||
+      !SUPABASE_SERVICE_ROLE_KEY ||
       !CPX_APP_SECURE_HASH
     ) {
+      console.error(
+        "Missing server environment variables"
+      );
 
-      return res.status(400).json({
-        success: false,
-        error: "Missing required parameters"
-      });
-
+      return res.status(500).send("Server configuration error");
     }
 
 
-    /*
-      CPX secure hash:
-      MD5(trans_id + "-" + app_secure_hash)
-    */
+    // Check required CPX parameters
+    if (
+      !transId ||
+      !userId ||
+      !receivedHash
+    ) {
+      return res.status(400).send(
+        "Missing required parameters"
+      );
+    }
+
+
+    // CPX secure hash:
+    // MD5(trans_id-APP_SECURE_HASH)
 
     const expectedHash =
       md5(
@@ -114,16 +121,12 @@ export default async function handler(req, res) {
       );
 
 
-    /*
-      Constant-time hash comparison
-    */
-
+    // Timing-safe hash comparison
     const receivedBuffer =
       Buffer.from(receivedHash);
 
     const expectedBuffer =
       Buffer.from(expectedHash);
-
 
     if (
       receivedBuffer.length !==
@@ -134,34 +137,31 @@ export default async function handler(req, res) {
       )
     ) {
 
-      return res.status(403).json({
-        success: false,
-        error: "Invalid secure hash"
-      });
+      console.error(
+        "Invalid CPX secure hash"
+      );
 
+      return res.status(403).send(
+        "Invalid secure hash"
+      );
     }
 
 
-    /*
-      Only accept known CPX statuses
-    */
+    // CPX status:
+    // 1 = completed / credit
+    // 2 = reversed / chargeback
 
     if (
       status !== 1 &&
       status !== 2
     ) {
-
-      return res.status(400).json({
-        success: false,
-        error: "Invalid status"
-      });
-
+      return res.status(400).send(
+        "Invalid status"
+      );
     }
 
 
-    /*
-      Call secure Supabase RPC
-    */
+    // Send transaction to Supabase RPC
 
     const rpcResponse =
       await fetch(
@@ -211,7 +211,6 @@ export default async function handler(req, res) {
 
             p_ip_click:
               ipClick
-
           })
         }
       );
@@ -228,11 +227,9 @@ export default async function handler(req, res) {
         rpcText
       );
 
-      return res.status(500).json({
-        success: false,
-        error: "Database processing failed"
-      });
-
+      return res.status(500).send(
+        "Database processing failed"
+      );
     }
 
 
@@ -247,14 +244,20 @@ export default async function handler(req, res) {
     }
 
 
-    /*
-      Success response to CPX
-    */
+    console.log(
+      "CPX postback processed:",
+      {
+        transId,
+        userId,
+        status,
+        amountLocal,
+        rpcResult
+      }
+    );
 
-    return res.status(200).json({
-      success: true,
-      result: rpcResult
-    });
+
+    // CPX successfully received
+    return res.status(200).send("OK");
 
 
   } catch (error) {
@@ -264,11 +267,8 @@ export default async function handler(req, res) {
       error
     );
 
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error"
-    });
-
+    return res.status(500).send(
+      "Internal server error"
+    );
   }
-
 }
