@@ -88,8 +88,8 @@
     <div class="provider-grid">
 
       <button onclick="openCPX()" class="provider-btn">
-  📊 CPX Research
-</button>
+       📊 CPX Research
+      </button>
 
       <a href="#" class="provider-btn">
         📝 BitLabs
@@ -141,6 +141,68 @@ atOptions = {
 <footer>
   © 2026 LSR Earning Point
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 
+<script>
+const offerwallSupabase =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+async function openCPX() {
+
+  try {
+
+    const {
+      data: {
+        user
+      },
+      error
+    } =
+      await offerwallSupabase.auth.getUser();
+
+    if (error || !user) {
+
+      alert("Please login first to use CPX Research.");
+
+      window.location.href = "login.html";
+
+      return;
+    }
+
+    /*
+      Supabase Auth user.id is used as
+      CPX external user ID.
+    */
+
+    const userId =
+      encodeURIComponent(user.id);
+
+    const email =
+      encodeURIComponent(user.email || "");
+
+    const cpxURL =
+      "https://offers.cpx-research.com/index.php" +
+      "?app_id=35850" +
+      "&ext_user_id=" + userId +
+      "&email=" + email;
+
+    window.location.href = cpxURL;
+
+  } catch (error) {
+
+    console.error(
+      "CPX error:",
+      error
+    );
+
+    alert(
+      "Unable to open CPX Research. Please try again."
+    );
+  }
+}
+</script>
 </body>
 </html>
