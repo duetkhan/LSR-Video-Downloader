@@ -207,9 +207,9 @@
 <input
   type="number"
   id="withdrawAmount"
-  min="110"
+  min="5000"
   step="1"
-  placeholder="Minimum 110 Coins"
+  placeholder="Minimum 5000 Coins"
 >
 
 
@@ -530,11 +530,11 @@ async function requestWithdrawal() {
      MINIMUM WITHDRAWAL
   ========================= */
 
-  if (amount < 110) {
+  if (amount < 5000) {
 
     message.innerHTML =
       `<div class="status">
-        Minimum withdrawal amount is 110 Coins.
+        Minimum withdrawal amount is 5000 Coins.
       </div>`;
 
     return;
