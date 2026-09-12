@@ -10,6 +10,9 @@ const CPX_APP_SECURE_HASH =
   process.env.CPX_APP_SECURE_HASH;
 
 
+/*
+  MD5 helper
+*/
 function md5(value) {
   return crypto
     .createHash("md5")
@@ -18,7 +21,12 @@ function md5(value) {
 }
 
 
+/*
+  Get CPX data
+  Supports GET and POST
+*/
 function getData(req) {
+
   // GET request
   if (req.method === "GET") {
     return req.query || {};
@@ -29,90 +37,218 @@ function getData(req) {
 }
 
 
+/*
+  Main handler
+*/
 export default async function handler(req, res) {
 
-  // CPX postback can be received through GET or POST
-  if (req.method !== "GET" && req.method !== "POST") {
-    return res.status(405).send("Method Not Allowed");
+  /*
+    CPX postback can be received
+    through GET or POST
+  */
+  if (
+    req.method !== "GET" &&
+    req.method !== "POST"
+  ) {
+    return res
+      .status(405)
+      .send("Method Not Allowed");
   }
+
 
   try {
 
     const body = getData(req);
 
+
+    /*
+      CPX status
+      1 = completed / credit
+      2 = reversed / cancelled
+    */
     const status =
       Number(body.status);
 
+
+    /*
+      Transaction ID
+    */
     const transId =
       String(body.trans_id || "");
 
+
+    /*
+      Supabase User ID
+    */
     const userId =
       String(body.user_id || "");
 
-    const amountLocal =
-      String(body.amount_local || "0");
 
+    /*
+      IMPORTANT:
+      CPX may send amount_local as:
+
+      1000
+      1000.0000
+
+      Our Supabase RPC expects BIGINT.
+
+      Therefore convert it safely
+      into an integer.
+    */
+    const amountLocal =
+      Math.round(
+        Number(body.amount_local || 0)
+      );
+
+
+    /*
+      Publisher earning in USD
+    */
     const amountUsd =
       Number(body.amount_usd || 0);
 
+
+    /*
+      Optional offer ID
+    */
     const offerId =
       body.offer_id
         ? String(body.offer_id)
         : null;
 
+
+    /*
+      Optional sub ID 1
+    */
     const subId =
       body.sub_id
         ? String(body.sub_id)
         : null;
 
+
+    /*
+      Optional sub ID 2
+    */
     const subId2 =
       body.sub_id_2
         ? String(body.sub_id_2)
         : null;
 
+
+    /*
+      Transaction type
+      complete / bonus / etc.
+    */
     const transactionType =
       body.type
         ? String(body.type)
         : null;
 
+
+    /*
+      User click IP
+    */
     const ipClick =
       body.ip_click
         ? String(body.ip_click)
         : null;
 
+
+    /*
+      Secure hash sent by CPX
+    */
     const receivedHash =
       String(body.hash || "");
 
 
-    // Check required environment variables
+    /*
+      Check server environment variables
+    */
     if (
       !SUPABASE_URL ||
       !SUPABASE_SERVICE_ROLE_KEY ||
       !CPX_APP_SECURE_HASH
     ) {
+
       console.error(
         "Missing server environment variables"
       );
 
-      return res.status(500).send("Server configuration error");
+      return res
+        .status(500)
+        .send(
+          "Server configuration error"
+        );
     }
 
 
-    // Check required CPX parameters
+    /*
+      Check required CPX parameters
+    */
     if (
       !transId ||
       !userId ||
       !receivedHash
     ) {
-      return res.status(400).send(
-        "Missing required parameters"
-      );
+
+      return res
+        .status(400)
+        .send(
+          "Missing required parameters"
+        );
     }
 
 
-    // CPX secure hash:
-    // MD5(trans_id-APP_SECURE_HASH)
+    /*
+      Validate amounts
+    */
+    if (
+      !Number.isFinite(amountLocal) ||
+      !Number.isInteger(amountLocal) ||
+      amountLocal < 0
+    ) {
 
+      console.error(
+        "Invalid amount_local:",
+        body.amount_local
+      );
+
+      return res
+        .status(400)
+        .send(
+          "Invalid amount_local"
+        );
+    }
+
+
+    if (
+      !Number.isFinite(amountUsd) ||
+      amountUsd < 0
+    ) {
+
+      console.error(
+        "Invalid amount_usd:",
+        body.amount_usd
+      );
+
+      return res
+        .status(400)
+        .send(
+          "Invalid amount_usd"
+        );
+    }
+
+
+    /*
+      CPX Secure Hash
+
+      MD5(
+        trans_id
+        -
+        APP_SECURE_HASH
+      )
+    */
     const expectedHash =
       md5(
         transId +
@@ -121,12 +257,21 @@ export default async function handler(req, res) {
       );
 
 
-    // Timing-safe hash comparison
+    /*
+      Timing-safe hash comparison
+    */
     const receivedBuffer =
-      Buffer.from(receivedHash);
+      Buffer.from(
+        receivedHash,
+        "utf8"
+      );
 
     const expectedBuffer =
-      Buffer.from(expectedHash);
+      Buffer.from(
+        expectedHash,
+        "utf8"
+      );
+
 
     if (
       receivedBuffer.length !==
@@ -141,28 +286,33 @@ export default async function handler(req, res) {
         "Invalid CPX secure hash"
       );
 
-      return res.status(403).send(
-        "Invalid secure hash"
-      );
+      return res
+        .status(403)
+        .send(
+          "Invalid secure hash"
+        );
     }
 
 
-    // CPX status:
-    // 1 = completed / credit
-    // 2 = reversed / chargeback
-
+    /*
+      Validate CPX status
+    */
     if (
       status !== 1 &&
       status !== 2
     ) {
-      return res.status(400).send(
-        "Invalid status"
-      );
+
+      return res
+        .status(400)
+        .send(
+          "Invalid status"
+        );
     }
 
 
-    // Send transaction to Supabase RPC
-
+    /*
+      Send transaction to Supabase RPC
+    */
     const rpcResponse =
       await fetch(
         `${SUPABASE_URL}/rest/v1/rpc/cpx_process_transaction`,
@@ -216,10 +366,16 @@ export default async function handler(req, res) {
       );
 
 
+    /*
+      Read Supabase response
+    */
     const rpcText =
       await rpcResponse.text();
 
 
+    /*
+      Supabase RPC failed
+    */
     if (!rpcResponse.ok) {
 
       console.error(
@@ -227,23 +383,34 @@ export default async function handler(req, res) {
         rpcText
       );
 
-      return res.status(500).send(
-        "Database processing failed"
-      );
+      return res
+        .status(500)
+        .send(
+          "Database processing failed"
+        );
     }
 
 
+    /*
+      Parse RPC result
+    */
     let rpcResult;
 
     try {
+
       rpcResult =
         JSON.parse(rpcText);
+
     } catch {
+
       rpcResult =
         rpcText;
     }
 
 
+    /*
+      Log successful transaction
+    */
     console.log(
       "CPX postback processed:",
       {
@@ -251,13 +418,18 @@ export default async function handler(req, res) {
         userId,
         status,
         amountLocal,
+        amountUsd,
         rpcResult
       }
     );
 
 
-    // CPX successfully received
-    return res.status(200).send("OK");
+    /*
+      CPX successfully received
+    */
+    return res
+      .status(200)
+      .send("OK");
 
 
   } catch (error) {
@@ -267,8 +439,10 @@ export default async function handler(req, res) {
       error
     );
 
-    return res.status(500).send(
-      "Internal server error"
-    );
+    return res
+      .status(500)
+      .send(
+        "Internal server error"
+      );
   }
 }
