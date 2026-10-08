@@ -21,7 +21,7 @@ function startDownload() {
 
   // Smartlink only onclick
   window.open(
-    "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
+    "https://www.profitableratecpmnetwork.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
     "_blank"
   );
 }
@@ -57,7 +57,7 @@ function browserSearch() {
 /* --------- CLICK & EARN --------- */
 function openSmartLink() {
   window.open(
-    "https://www.effectivegatecpm.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
+    "https://www.profitableratecpmnetwork.com/nb3ev3ys3?key=9a54ab0abd26e3dccdcb180ad201724f",
     "_blank"
   );
 }
