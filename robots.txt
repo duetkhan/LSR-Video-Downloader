@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lsr-video-downloaders.vercel.app/sitemap.xml
